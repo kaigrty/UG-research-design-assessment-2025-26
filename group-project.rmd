@@ -7,6 +7,8 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(here)
 ```
 
 NOTE: Please don't edit this template directly. Use `File` > `Save as` to create a copy of this document, rename it (remove the word "template" from the file name) and use that new version to write your report. Make sure to also update the Title and Author fields in the YAML of your .Rmd file.
@@ -15,7 +17,7 @@ NOTE: Please don't edit this template directly. Use `File` > `Save as` to create
 
 ```{r load-wrangle}
 # load and wrangle the data here
-
+data <- read_csv(here("data/HIIT-postpartum-depression.csv"))
 
 ```
 
