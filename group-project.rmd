@@ -11,7 +11,10 @@ library(readr)
 library(here)
 library(janitor)
 library(magrittr)
+
+library(ggplot2)
 ```
+
 
 NOTE: Please don't edit this template directly. Use `File` > `Save as` to create a copy of this document, rename it (remove the word "template" from the file name) and use that new version to write your report. Make sure to also update the Title and Author fields in the YAML of your .Rmd file.
 
@@ -23,6 +26,37 @@ data <- read_csv(here("data/HIIT-postpartum-depression.csv")) %>%
   clean_names()
   
 data[data == "#NULL!"] <- NA # standardising missing values to NA's instead of "#NULL!"
+
+figure3_data <- data %>%
+  # assign readable interventions to groups
+  mutate(
+    group = case_when(
+      `intervention_group` == 1 ~ "HIIT – High Intensity Interval Training Group",
+      `intervention_group` == 2 ~ "EDU – Educational Intervention Group"
+    ),
+    # create column for depression score cutoffs
+    EPDS = as.numeric(`edinburg_postnatal_depression_scale_score`),
+    category = case_when(
+      EPDS < 10 ~ "range indicating the norm (below 10 points)",
+      EPDS >= 10 & EPDS < 12 ~ "slightly increased severity of PPD symptoms (10-11 points)",
+      EPDS >= 12 ~ "increased severity of PPD symptoms (12 or more points)"
+    )
+  ) %>% 
+  # calculate percentages
+  drop_na(category) %>%
+  count(group, category) %>%
+  group_by(group) %>%
+  mutate(percent = n / sum(n) * 100) %>% 
+  ungroup() %>% 
+  mutate(group = factor(group, levels = c(
+      "HIIT – High Intensity Interval Training Group",
+      "EDU – Educational Intervention Group"
+    )),
+    category = factor(category, levels = c(
+      "increased severity of PPD symptoms (12 or more points)",
+      "slightly increased severity of PPD symptoms (10-11 points)",
+      "range indicating the norm (below 10 points)"))
+  )
 ```
 
 
@@ -30,6 +64,36 @@ data[data == "#NULL!"] <- NA # standardising missing values to NA's instead of "
 ```{r figure-3}
 # Write your code for reproducing, and then improving Figure 3. Present both figures together. Under the figures, explain how you've improved Figure 3 and why you consider this an improvement.
 
+# replicated figure 3
+ggplot(figure3_data, aes(x = percent, y = group, fill = category)) +
+  geom_col(width = 0.25) +
+  scale_x_continuous(
+    breaks = seq(0, 100, by = 10),
+    labels = scales::label_percent(scale = 1, accuracy = 0.01),
+    expand = c(0, 0)
+  ) +
+  scale_fill_manual(
+    values = c(
+      "range indicating the norm (below 10 points)" = "#9EC1FF",
+      "slightly increased severity of PPD symptoms (10-11 points)" = "#0B3C8A",
+      "increased severity of PPD symptoms (12 or more points)" = "#C21F17"
+    ),
+    name = NULL
+  ) +
+  labs(
+    x = NULL,
+    y = NULL
+  ) +
+  theme_minimal(base_size = 12) +
+  guides(fill = guide_legend(reverse = TRUE)) +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    legend.position = "bottom",
+    legend.direction = "vertical",
+    axis.text.y = element_text(size = 9),
+    axis.text.x = element_text(size = 10)
+  )
 ```
 
 
