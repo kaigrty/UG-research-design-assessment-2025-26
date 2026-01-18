@@ -114,7 +114,7 @@ ggplot(figure3_data, aes(x = percent, y = group, fill = category)) +
     ),
     name = NULL
   ) +
-  geom_text(aes(label = n), position = position_stack(vjust = 0.5), color = "#FFFFFF") +
+  geom_text(aes(label = paste0(sprintf("%.2f", percent), "%")), position = position_stack(vjust = 0.5), color = "#FFFFFF") +
   labs(
     x = NULL,
     y = NULL,
@@ -132,10 +132,11 @@ ggplot(figure3_data, aes(x = percent, y = group, fill = category)) +
     axis.text.x = element_text(size = 10)
   )
 ```
-- Accuracy of percent labels can be 1 for clearer visuals
+- Accuracy of x-axis labels changed to 1 for clearer visuals
 - Added title for better presentation of information
 - Added minor breaks for easier interpretation of data
-- Added labels for the numbers in each edps subgroup
+- Added labels for the numbers in each EDPS subgroup
+- Added percentage labels so more valuable information can be gleaned from the graph, showing two decimal places for accuracy
 
 ### Figure 4 - James
 ```{r figure-4}
