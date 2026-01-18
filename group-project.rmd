@@ -13,6 +13,8 @@ library(janitor)
 library(magrittr)
 
 library(ggplot2)
+library(dplyr)
+library(tidyr)
 ```
 
 
@@ -94,8 +96,46 @@ ggplot(figure3_data, aes(x = percent, y = group, fill = category)) +
     axis.text.y = element_text(size = 9),
     axis.text.x = element_text(size = 10)
   )
-```
 
+# improved figure 3
+ggplot(figure3_data, aes(x = percent, y = group, fill = category)) +
+  geom_col(width = 0.25) +
+  scale_x_continuous(
+    breaks = seq(0, 100, 10),
+    minor_breaks = seq(0, 100, 5),
+    labels = scales::label_percent(scale = 1, accuracy = 1),
+    expand = c(0, 0)
+  ) +
+  scale_fill_manual(
+    values = c(
+      "range indicating the norm (below 10 points)" = "#9EC1FF",
+      "slightly increased severity of PPD symptoms (10-11 points)" = "#0B3C8A",
+      "increased severity of PPD symptoms (12 or more points)" = "#C21F17"
+    ),
+    name = NULL
+  ) +
+  geom_text(aes(label = n), position = position_stack(vjust = 0.5), color = "#FFFFFF") +
+  labs(
+    x = NULL,
+    y = NULL,
+    title = "Distribution of EDPS results in the Educational Intervention (EDU) and High Intensity Interval Training (HIIT) groups in the postpartum assessment"
+  ) +
+  theme_minimal(base_size = 12) +
+  guides(fill = guide_legend(reverse = TRUE)) +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    panel.grid.minor.x = element_line(),
+    legend.position = "bottom",
+    legend.direction = "vertical",
+    axis.text.y = element_text(size = 9),
+    axis.text.x = element_text(size = 10)
+  )
+```
+- Accuracy of percent labels can be 1 for clearer visuals
+- Added title for better presentation of information
+- Added minor breaks for easier interpretation of data
+- Added labels for the numbers in each edps subgroup
 
 ### Figure 4 - James
 ```{r figure-4}
