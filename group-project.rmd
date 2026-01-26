@@ -36,6 +36,7 @@ figure3_data <- data %>%
       `intervention_group` == 1 ~ "HIIT – High Intensity Interval Training Group",
       `intervention_group` == 2 ~ "EDU – Educational Intervention Group"
     ),
+    
     # create column for depression score cutoffs
     EPDS = as.numeric(`edinburg_postnatal_depression_scale_score`),
     category = case_when(
@@ -44,6 +45,7 @@ figure3_data <- data %>%
       EPDS >= 12 ~ "increased severity of PPD symptoms (12 or more points)"
     )
   ) %>% 
+  
   # calculate percentages
   drop_na(category) %>%
   count(group, category) %>%
@@ -151,5 +153,8 @@ ggplot(figure3_data, aes(x = percent, y = group, fill = category)) +
 
 
 ## Task 2: FAIR data principles
+The data set is findable: with a unique and persistent DOI. There is metadata providing a description of the dataset along with a title, authors, date of publication, and the identifier of the dataset, on the dataset's page where it is indexed in the Mendeley Data repository. The data also does well in accessibility, as the DOI allows for direct access to the dataset using standard web protocol, there are no barriers to access and no closed system involved. The metadata would stay accessible if the data became no longer available because it is stored in a persistent page independent of the files. On interoperability, the dataset uses standardised international psychological and physical activity measurement tools like the Beck depression inventory II and Edinburgh postnatal depression scale, meaning the information can be understood well by health researchers. However, there is no reported use of ontological vocabularies with identifiers, so this is a point for possible improvement. The metadata does include explicit qualified references to other sources of information, clearly stating the relationship between the two data, such as the study the data comes from, the measurement tools used, and the trial registration ID. Lastly, to address reusability, the data and metadata are described thoroughly with reference made to study design, population, interventions and outcome measures. There is a visible creative commons data usage license on the repository page with explicit permissions for reuse of the data. The metadata clearly states the study that the data originates from with all relevant information about the study present as well. The metadata also meets the standards of health research, complying with CONSORT guidelines for information presentation and standardised measurements, while the repository page includes guidance on reproducing the research.
+
 
 ## Task 3: Reproducibility brief
+
