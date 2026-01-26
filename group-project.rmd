@@ -42,6 +42,36 @@ data[data == "#NULL!"] <- NA # standardising missing values to NA's instead of "
 ### Figure 5 - Fimi
 ```{r figure-5}
 # Write your code for reproducing, and then improving Figure 5. Present both figures together. Under the figures, explain how you've improved Figure 5 and why you consider this an improvement.
+
+# original reproduction of figure 5
+fig5 <- data %>% 
+   mutate(
+    pre_sf_12_pcs_physicalhealthscale = as.numeric(pre_sf_12_pcs_physicalhealthscale),
+    post_sf12_pcs = as.numeric(post_sf12_pcs),
+    postnatal_sf_12_pcs = as.numeric(postnatal_sf_12_pcs)
+  ) %>% 
+  select(participant_code,intervention_group,pre_sf_12_pcs_physicalhealthscale,post_sf12_pcs,postnatal_sf_12_pcs) %>% 
+  pivot_longer(
+    cols = c(
+      pre_sf_12_pcs_physicalhealthscale,
+      post_sf12_pcs,
+      postnatal_sf_12_pcs
+    ),
+    names_to = "time",
+    values_to = "physical_health"
+  ) %>% 
+   mutate(
+    time = factor(
+      time,
+      levels = c(
+        "pre_sf_12_pcs_physicalhealthscale",
+        "post_sf12_pcs",
+        "postnatal_sf_12_pcs"
+      ),
+      labels = c(
+        "Before intervention",
+        "After intervention",
+        "Follow-up" )))
 ```
 
 
