@@ -64,10 +64,13 @@ fig5 <- data %>%
         "post_sf12_pcs",
         "postnatal_sf_12_pcs"),
       labels = c(
-        "Before intervention",
-        "After intervention",
-        "Follow-up" ))) %>% 
-# changes the name of the time columns to match intevetion timing
+        "Before intervention 
+        (II trimester of pregnancy",
+        "After intervention
+        (III trimester of pregnancy)",
+        "Follow-up
+        (± 5 months postpartum" ))) %>% 
+# changes the name of the time columns to match intervetion timing
 
     filter(!is.na(physical_health)) %>% 
     mutate(intervention_group = factor(intervention_group))
@@ -91,15 +94,14 @@ fig5_summary <- fig5 %>%
 ggplot(fig5_summary, aes(x=time,y=mean_physical,
                          group=intervention_group,
                          linetype = intervention_group)) +
-  geom_line(size=1) +
-  geom_point(size=3) +
+  geom_line(size=0.5) +
   geom_errorbar(aes(
     ymin = mean_physical-sd_physical,
     ymax = mean_physical+sd_physical
   ),
-  width = 0.1) +
+  width = 0.05) +
   scale_linetype_manual(values=c("solid","dotted")) +
-  labs(
+  labs(title = bquote(bold("Physical health")~"(measured with the Short Form Health Survey-physical subscale)"),
     x="Time",
     y= "Physical health (SF-12 physical subscale)"
   )+
