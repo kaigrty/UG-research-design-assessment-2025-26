@@ -11,6 +11,7 @@ library(readr)
 library(here)
 library(janitor)
 library(magrittr)
+library(tidyverse)
 ```
 
 NOTE: Please don't edit this template directly. Use `File` > `Save as` to create a copy of this document, rename it (remove the word "template" from the file name) and use that new version to write your report. Make sure to also update the Title and Author fields in the YAML of your .Rmd file.
@@ -45,35 +46,65 @@ data[data == "#NULL!"] <- NA # standardising missing values to NA's instead of "
 
 # original reproduction of figure 5
 fig5 <- data %>% 
-   mutate(
-    pre_sf_12_pcs_physicalhealthscale = as.numeric(pre_sf_12_pcs_physicalhealthscale),
-    post_sf12_pcs = as.numeric(post_sf12_pcs),
-    postnatal_sf_12_pcs = as.numeric(postnatal_sf_12_pcs)
-  ) %>% 
-  select(participant_code,intervention_group,pre_sf_12_pcs_physicalhealthscale,post_sf12_pcs,postnatal_sf_12_pcs) %>% 
+  select(participant_code,intervention_group,pre_sf_12_pcs_physicalhealthscale,post_sf12_pcs,postnatal_sf_12_pcs) %>%
+  # select the groups physical health before, after and follow up from intervention
+  mutate(pre_sf_12_pcs_physicalhealthscale = as.numeric(pre_sf_12_pcs_physicalhealthscale),post_sf12_pcs = as.numeric(post_sf12_pcs),postnatal_sf_12_pcs = as.numeric(postnatal_sf_12_pcs)) %>% 
+# make a new column and make all the columns same value 
+
   pivot_longer(
-    cols = c(
-      pre_sf_12_pcs_physicalhealthscale,
+    cols = c(pre_sf_12_pcs_physicalhealthscale,
       post_sf12_pcs,
-      postnatal_sf_12_pcs
-    ),
+      postnatal_sf_12_pcs ), 
     names_to = "time",
-    values_to = "physical_health"
-  ) %>% 
-   mutate(
-    time = factor(
-      time,
-      levels = c(
+    values_to = "physical_health") %>% 
+  # lengthens data and increase number of rows and decreases columns 
+    
+   mutate(time = factor( time,levels = c(
         "pre_sf_12_pcs_physicalhealthscale",
         "post_sf12_pcs",
-        "postnatal_sf_12_pcs"
-      ),
+        "postnatal_sf_12_pcs"),
       labels = c(
         "Before intervention",
         "After intervention",
-        "Follow-up" )))
+        "Follow-up" ))) %>% 
+# changes the name of the time columns to match intevetion timing
+
+    filter(!is.na(physical_health)) %>% 
+    mutate(intervention_group = factor(intervention_group))
+  
 ```
 
+```{r figure-5}
+# CALCULATE MEAN AND STANDARD DEVIATION
+
+fig5_summary <- fig5 %>% 
+  group_by(intervention_group,time)%>% 
+  summarise(mean_physical = mean(physical_health),sd_physical = sd(physical_health))
+```
+
+```{r}
+
+```
+
+
+```{r}
+ggplot(fig5_summary, aes(x=time,y=mean_physical,
+                         group=intervention_group,
+                         linetype = intervention_group)) +
+  geom_line(size=1) +
+  geom_point(size=3) +
+  geom_errorbar(aes(
+    ymin = mean_physical-sd_physical,
+    ymax = mean_physical+sd_physical
+  ),
+  width = 0.1) +
+  scale_linetype_manual(values=c("solid","dotted")) +
+  labs(
+    x="Time",
+    y= "Physical health (SF-12 physical subscale)"
+  )+
+  theme_classic()
+```
 
 ## Task 2: FAIR data principles
 
