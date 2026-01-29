@@ -82,11 +82,8 @@ fig5 <- data %>%
 
 fig5_summary <- fig5 %>% 
   group_by(intervention_group,time)%>% 
-  summarise(mean_physical = mean(physical_health),sd_physical = sd(physical_health))
-```
-
-```{r}
-
+  summarise(mean_physical = mean(physical_health),sd_physical = sd(physical_health)) %>% 
+ mutate(mean_round = round(mean_physical,2)) 
 ```
 
 
@@ -100,6 +97,10 @@ ggplot(fig5_summary, aes(x=time,y=mean_physical,
     ymax = mean_physical+sd_physical
   ),
   width = 0.05) +
+  geom_text(aes(label = paste0("M =", mean_round)), 
+            position = position_dodge(width = 0.2),
+            vjust = -1,
+            size = 3)+
   scale_linetype_manual(values=c("solid","dotted")) +
   labs(title = bquote(bold("Physical health")~"(measured with the Short Form Health Survey-physical subscale)"),
     x="Time",
