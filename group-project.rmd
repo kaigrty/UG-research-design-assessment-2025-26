@@ -45,6 +45,7 @@ figure3_data <- data %>%
       EPDS >= 12 ~ "increased severity of PPD symptoms (12 or more points)"
     )
   ) %>% 
+  filter(!is.na(edinburg_postnatal_depression_scale_score)) %>% 
   
   # calculate percentages
   drop_na(category) %>%
@@ -64,7 +65,7 @@ figure3_data <- data %>%
 ```
 
 
-### Figure 3 - Kai (shaper)
+### Figure 3 - Kai
 ```{r figure-3}
 # Write your code for reproducing, and then improving Figure 3. Present both figures together. Under the figures, explain how you've improved Figure 3 and why you consider this an improvement.
 
