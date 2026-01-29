@@ -65,7 +65,7 @@ fig5 <- data %>%
         "postnatal_sf_12_pcs"),
       labels = c(
         "Before intervention 
-        (II trimester of pregnancy",
+        (II trimester of pregnancy)",
         "After intervention
         (III trimester of pregnancy)",
         "Follow-up
