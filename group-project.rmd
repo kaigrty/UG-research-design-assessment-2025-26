@@ -106,7 +106,31 @@ ggplot(fig5_summary, aes(x=time,y=mean_physical,
     x="Time",
     y= "Physical health (SF-12 physical subscale)"
   )+
+  theme_minimal()
+```
+
+```{r}
+#new
+ggplot(fig5_summary, aes(x=time,y=mean_physical,
+colour = intervention_group,
+group = intervention_group)) +
+  geom_line(size=0.5) +
+  geom_errorbar(aes(
+    ymin = mean_physical-sd_physical,
+    ymax = mean_physical+sd_physical
+  ),
+  width = 0.05) +
+  geom_text(aes(label = paste0("M =", mean_round)), 
+            position = position_dodge(width = 0.2),
+            vjust = -1,
+            size = 3)+
+  scale_linetype_manual(values=c("solid","dotted")) +
+  labs(title = "Physical health scores across pregnancy and postpartum",
+    x="Assessment time point",
+    y= "SF-12 physical health score"
+  )+
   theme_classic()
+```
 ```
 
 ## Task 2: FAIR data principles
