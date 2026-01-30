@@ -1,8 +1,10 @@
 ---
 title: "Group project assessment [template]"
-author: 'B249199, B249281'
+author: "B249199, B249281"
 date: "`r Sys.Date()`"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -29,6 +31,7 @@ data <- read_csv(here("data/HIIT-postpartum-depression.csv")) %>%
   
 data[data == "#NULL!"] <- NA # standardising missing values to NA's instead of "#NULL!"
 
+# figure 3 data
 figure3_data <- data %>%
   # assign readable interventions to groups
   mutate(
@@ -36,7 +39,6 @@ figure3_data <- data %>%
       `intervention_group` == 1 ~ "HIIT – High Intensity Interval Training Group",
       `intervention_group` == 2 ~ "EDU – Educational Intervention Group"
     ),
-    
     # create column for depression score cutoffs
     EPDS = as.numeric(`edinburg_postnatal_depression_scale_score`),
     category = case_when(
@@ -45,8 +47,7 @@ figure3_data <- data %>%
       EPDS >= 12 ~ "increased severity of PPD symptoms (12 or more points)"
     )
   ) %>% 
-  filter(!is.na(edinburg_postnatal_depression_scale_score)) %>% 
-  
+  filter(!is.na(number_of_hiit_sessions_own_activity)) %>% 
   # calculate percentages
   drop_na(category) %>%
   count(group, category) %>%
@@ -62,6 +63,7 @@ figure3_data <- data %>%
       "slightly increased severity of PPD symptoms (10-11 points)",
       "range indicating the norm (below 10 points)"))
   )
+
 ```
 
 
@@ -71,11 +73,10 @@ figure3_data <- data %>%
 
 # replicated figure 3
 ggplot(figure3_data, aes(x = percent, y = group, fill = category)) +
-  geom_col(width = 0.25) +
+  geom_col(width = 0.4) +
   scale_x_continuous(
     breaks = seq(0, 100, by = 10),
-    labels = scales::label_percent(scale = 1, accuracy = 0.01),
-    expand = c(0, 0)
+    labels = scales::label_percent(scale = 1, accuracy = 0.01)
   ) +
   scale_fill_manual(
     values = c(
@@ -89,57 +90,71 @@ ggplot(figure3_data, aes(x = percent, y = group, fill = category)) +
     x = NULL,
     y = NULL
   ) +
-  theme_minimal(base_size = 12) +
+  theme_bw() +
   guides(fill = guide_legend(reverse = TRUE)) +
   theme(
+    plot.margin = margin(t = 20, r = 5, b = 90, l = 30),
+    panel.border = element_blank(),
     panel.grid.major.y = element_blank(),
     panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_line(colour = "grey85", linewidth = 0.8),
     legend.position = "bottom",
+    legend.key.size = unit(0.4, "cm"),
+    legend.key.spacing.y = unit(0.4, "cm"),
+    legend.key.width  = unit(0.4, "cm"),
+    legend.key.height = unit(0.05, "cm"),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 13),
     legend.direction = "vertical",
-    axis.text.y = element_text(size = 9),
-    axis.text.x = element_text(size = 10)
+    axis.ticks.y = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.text.y = element_text(size = 12, color = "black", hjust = 1, margin = margin(r = -25)),
+    axis.text.x = element_text(size = 12, color = "black")
   )
 
 # improved figure 3
-ggplot(figure3_data, aes(x = percent, y = group, fill = category)) +
+ggplot(figure3_data, aes(x = percent, 
+                         y = recode(group,
+                                    "HIIT – High Intensity Interval Training Group" = "HIIT",
+                                    "EDU – Educational Intervention Group" = "EDU",), fill = category)) +
   geom_col(width = 0.25) +
   scale_x_continuous(
     breaks = seq(0, 100, 10),
-    minor_breaks = seq(0, 100, 5),
-    labels = scales::label_percent(scale = 1, accuracy = 1),
-    expand = c(0, 0)
-  ) +
+    labels = scales::label_percent(scale = 1)) +
   scale_fill_manual(
     values = c(
-      "range indicating the norm (below 10 points)" = "#9EC1FF",
-      "slightly increased severity of PPD symptoms (10-11 points)" = "#0B3C8A",
-      "increased severity of PPD symptoms (12 or more points)" = "#C21F17"
+      "range indicating the norm (below 10 points)" = "#C9C9C9",
+      "slightly increased severity of PPD symptoms (10-11 points)" = "#9ECBED",
+      "increased severity of PPD symptoms (12 or more points)" = "#3C97DA"
     ),
-    name = NULL
+    labels = c(
+      "increased severity (>12 points)",
+      "slightly increased severity (10-11 points)",
+      "healthy (<10 points)"
+    ),
+    name = "Postpartum depression severity levels"
   ) +
-  geom_text(aes(label = paste0(sprintf("%.2f", percent), "%")), position = position_stack(vjust = 0.5), color = "#FFFFFF") +
+  geom_text(aes(label = paste0(sprintf("%.2f", percent), "%")), 
+            position = position_stack(vjust = 0.5), 
+            color = "black") +
   labs(
     x = NULL,
     y = NULL,
-    title = "Distribution of EDPS results in the Educational Intervention (EDU) and High Intensity Interval Training (HIIT) groups in the postpartum assessment"
+    title = "Distribution of Edinburgh Postnatal Depression Score (EDPS) by postpartum intervention",
+    subtitle = "EDU = Educational Intervention, HIIT = High Intensity Interval Training"
   ) +
   theme_minimal(base_size = 12) +
-  guides(fill = guide_legend(reverse = TRUE)) +
   theme(
-    panel.grid.major.y = element_blank(),
     panel.grid.minor.y = element_blank(),
     panel.grid.minor.x = element_line(),
     legend.position = "bottom",
     legend.direction = "vertical",
-    axis.text.y = element_text(size = 9),
+    axis.text.y = element_text(size = 11),
     axis.text.x = element_text(size = 10)
   )
 ```
-- Accuracy of x-axis labels changed to 1 for clearer visuals
-- Added title for better presentation of information
-- Added minor breaks for easier interpretation of data
-- Added labels for the numbers in each EDPS subgroup
-- Added percentage labels so more valuable information can be gleaned from the graph, showing two decimal places for accuracy
+
+More progressive colours are used, with the distinct grey to communicate the healthy state as different from the two pathological. Added a title so the graph is self sufficient, and a subheading for acronyms so that they can be used on the y axis to give more space to the plot. Added percentage labels to the bars so the information being communicated is clearer, and minor breaks at each 5% interval for easier intuitive interpretation. Changed the label for severity under 10 points to a more accurate description.
 
 ### Figure 4 - James
 ```{r figure-4}
