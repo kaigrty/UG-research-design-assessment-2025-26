@@ -135,6 +135,63 @@ ggplot(data_4_long, aes(x = timepoint, y = mean, group = intervention_group, lin
     )
 ```
 
+```{r figure-4 improved}
+## Plot the graph
+ggplot(data_4_long, aes(x = timepoint, y = mean, group = intervention_group, color = factor(intervention_group))) +
+  geom_line() +
+  geom_point() +
+  # Creates error bars of the standard deviations
+  ## 'M =' text on the graph is added ## 
+  geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = 0.06, linetype = "solid", position = position_dodge(width = 0.03)) + # Error bars are shifted horizontally so no longer overlap
+  geom_text(aes(
+    label = sprintf("M = %.2f", mean), # Adds 2 decimal points to the 'M = '
+    hjust = case_when(
+    ## Shifts the first 2 'M = ' text labels to the left of the error bars, and the final one to the right
+      grepl("Before|After", timepoint) ~ 1.2,
+      grepl("Follow", timepoint) ~ -0.2
+      ),
+  vjust = case_when(
+    ## Shifts the 'M = ' up and down as not to overlap with the line.
+    grepl("Before", timepoint) ~ ifelse(intervention_group == 1, 1.3, 0.1),
+    grepl("After", timepoint) ~ ifelse(intervention_group == 1, -1.2, 1.8),
+    grepl("Follow", timepoint) ~ ifelse(intervention_group == 1, 0.6, 0.6)
+    )
+  ),
+  size = 3.2, # Change size of 'M = ' text
+  fontface = "bold", # Makes it bold
+  show.legend = FALSE # Otherwise there will be an 'a' in the legend key overlapping with the line
+  ) +
+  ## Legend configuration ##
+  theme(legend.position = "bottom") + # Moves legend to the bottom
+  guides(color = guide_legend(nrow = 2, byrow = TRUE)) + # Stacks the legend guide for the lines
+  scale_y_continuous(
+    limits = c(40, 56), # Sets y-axis from 40 to 60
+    breaks = seq(40, 60, by = 2) # Sets ticks every 2 units
+    ) +
+  scale_color_manual(
+    values = c("1" = "dodgerblue", "2" = "brown1"), # Sets contrasting colours for the lines
+    labels = c("**HIIT** - High Intensity Interval Training Group", "**EDU** - Educational Intervention Group")
+    ) + 
+  ## Y-axis is labelled on y-axis, and legend is labelled.
+  labs(
+    x = NULL,
+    y = "**Psychological well-being** (*measured with the Flourishing Scale*)",
+    color = "**Intervention Group** (*M = Mean*)"
+    ) +
+  theme(
+    ## element_markdown() is used on several areas of the graph in order to make text bold using the ggtext package.
+    axis.title.y = element_markdown(size = 10, margin = margin(t = 15, l = 10, r = 10)), # Y-axis is given margins to better fit onto graph.
+    legend.title = element_markdown(),
+    legend.text = element_markdown(),
+    legend.key = element_rect(fill = "transparent", color = NA), # Makes lines' key background transparent
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 1), # Adds border around the graph
+    panel.background = element_rect(fill = "white", color = NA), # Makes graph background white
+    panel.grid.major.y = element_line(color = "grey80"), # Adds major y-axis grid
+    panel.grid.minor.y = element_line(color = "grey80"), # Adds minor y-axis grid
+    panel.grid.major.x = element_blank() # There is a small vertical white line which interrupts the major y-axis grid lines without this.
+    )
+```
+
 ### Figure 5 - Fimi
 ```{r figure-5}
 # Write your code for reproducing, and then improving Figure 5. Present both figures together. Under the figures, explain how you've improved Figure 5 and why you consider this an improvement.
