@@ -28,7 +28,6 @@ data <- read_csv(here("data/HIIT-postpartum-depression.csv")) %>%
   clean_names()
   
 data[data == "#NULL!"] <- NA # standardising missing values to NA's instead of "#NULL!"
-
 ```
 
 
@@ -61,7 +60,7 @@ figure3_data <- data %>%
       "HIIT – High Intensity Interval Training Group",
       "EDU – Educational Intervention Group"
     )),
-    category = factor(category, levels = c(
+    category = factor(category, levels = c( # assign factor levels to EPDS levels for correct visualisation
       "increased severity of PPD symptoms (12 or more points)",
       "slightly increased severity of PPD symptoms (10-11 points)",
       "range indicating the norm (below 10 points)"))
@@ -70,10 +69,12 @@ figure3_data <- data %>%
 # replicated figure 3
 ggplot(figure3_data, aes(x = percent, y = group, fill = category)) +
   geom_col(width = 0.4) +
+  # x-axis percentage scale
   scale_x_continuous(
     breaks = seq(0, 100, by = 10),
     labels = scales::label_percent(scale = 1, accuracy = 0.01)
   ) +
+  # bar colours
   scale_fill_manual(
     values = c(
       "range indicating the norm (below 10 points)" = "#9EC1FF",
@@ -82,18 +83,22 @@ ggplot(figure3_data, aes(x = percent, y = group, fill = category)) +
     ),
     name = NULL
   ) +
+  # remove axis names
   labs(
     x = NULL,
     y = NULL
   ) +
   theme_bw() +
+  # reverse EPDS levels in legend
   guides(fill = guide_legend(reverse = TRUE)) +
   theme(
+    # general plot configuration
     plot.margin = margin(t = 20, r = 5, b = 90, l = 30),
     panel.border = element_blank(),
     panel.grid.major.y = element_blank(),
     panel.grid.minor = element_blank(),
     panel.grid.major.x = element_line(colour = "grey85", linewidth = 0.8),
+    # legend configuration
     legend.position = "bottom",
     legend.key.size = unit(0.4, "cm"),
     legend.key.spacing.y = unit(0.4, "cm"),
@@ -102,6 +107,7 @@ ggplot(figure3_data, aes(x = percent, y = group, fill = category)) +
     legend.text = element_text(size = 12),
     legend.title = element_text(size = 13),
     legend.direction = "vertical",
+    # axes configuration
     axis.ticks.y = element_blank(),
     axis.ticks.x = element_blank(),
     axis.text.y = element_text(size = 9.5, color = "black", hjust = 1, margin = margin(r = 1)),
@@ -112,15 +118,15 @@ ggplot(figure3_data, aes(x = percent, y = group, fill = category)) +
 ```{r figure-3 improved}
 # improved figure 3
 ggplot(figure3_data, aes(x = percent, 
-                         y = recode(group,
+                         y = recode(group, # remove full name of interventions
                                     "HIIT – High Intensity Interval Training Group" = "HIIT",
                                     "EDU – Educational Intervention Group" = "EDU",), fill = category)) +
   geom_col(width = 0.25) +
   scale_x_continuous(
     breaks = seq(0, 100, 10),
-    labels = scales::label_percent(scale = 1)) +
+    labels = scales::label_percent(scale = 1)) + # make percentage scale integer to reduce visual clutter
   scale_fill_manual(
-    values = c(
+    values = c( # more communicative colours
       "range indicating the norm (below 10 points)" = "grey",
       "slightly increased severity of PPD symptoms (10-11 points)" = "skyblue",
       "increased severity of PPD symptoms (12 or more points)" = "dodgerblue"
@@ -128,22 +134,24 @@ ggplot(figure3_data, aes(x = percent,
     labels = c(
       "increased severity (>12 points)",
       "slightly increased severity (10-11 points)",
-      "healthy (<10 points)"
+      "healthy (<10 points)" # name change to better represent severity level
     ),
-    name = "Postpartum depression severity levels"
+    name = "Postpartum depression severity levels" # legend title for clarity
   ) +
-  geom_text(aes(label = paste0(sprintf("%.2f", percent), "%")), 
+  geom_text(aes(label = paste0(sprintf("%.2f", percent), "%")), # labels for bar proportions 
             position = position_stack(vjust = 0.5), 
             color = "black") +
+  # add title and subtitle
   labs(
     x = NULL,
     y = NULL,
     title = "Distribution of Edinburgh Postnatal Depression Score (EDPS) by postpartum intervention",
     subtitle = "EDU = Educational Intervention, HIIT = High Intensity Interval Training"
   ) +
+  # minimal theme to increase focus on the data
   theme_minimal() +
   theme(
-    panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 1), # border to distinguish data from other info
     panel.grid.minor.y = element_blank(),
     panel.grid.minor.x = element_line(),
     legend.position = "bottom",
@@ -153,7 +161,7 @@ ggplot(figure3_data, aes(x = percent,
   )
 ```
 
-More progressive colours are used, with the distinct grey to communicate the healthy state as different from the two pathological. Added a title so the graph is self sufficient, and a subheading for acronyms so that they can be used on the y axis to give more space to the plot. Added percentage labels to the bars so the information being communicated is clearer, and minor breaks at each 5% interval for easier intuitive interpretation. Changed the label for severity under 10 points to a more accurate description.
+More progressive colours are used, with the distinct grey to communicate the healthy state as different from the two pathological ones. Added a title so the graph is self sufficient, and a subheading for acronyms so that they can be used on the y axis to give more space to the plot. Added percentage labels to the bars so the information being communicated is clearer, and minor breaks at each 5% interval for easier intuitive interpretation. Changed the label for severity under 10 points to a more accurate description.
 
 ### Figure 4 - James
 ```{r figure-4}
@@ -361,7 +369,6 @@ fig5_summary <- fig5 %>%
  mutate(mean_round = round(mean_physical,2)) 
 ```
 
-
 ```{r}
 ggplot(fig5_summary, aes(x=time,y=mean_physical,
                          group=intervention_group,
@@ -408,7 +415,7 @@ group = intervention_group)) +
 ```
 
 ## Task 2: FAIR data principles
-The data set is findable: with a unique and persistent DOI. There is metadata providing a description of the dataset along with a title, authors, date of publication, and the identifier of the dataset, on the dataset's page where it is indexed in the Mendeley Data repository. The data also does well in accessibility, as the DOI allows for direct access to the dataset using standard web protocol, there are no barriers to access and no closed system involved. The metadata would stay accessible if the data became no longer available because it is stored in a persistent page independent of the files. On interoperability, the dataset uses standardised international psychological and physical activity measurement tools like the Beck depression inventory II and Edinburgh postnatal depression scale, meaning the information can be understood well by health researchers. However, there is no reported use of ontological vocabularies with identifiers, so this is a point for possible improvement. The metadata does include explicit qualified references to other sources of information, clearly stating the relationship between the two data, such as the study the data comes from, the measurement tools used, and the trial registration ID. Lastly, to address reusability, the data and metadata are described thoroughly with reference made to study design, population, interventions and outcome measures. There is a visible creative commons data usage license on the repository page with explicit permissions for reuse of the data. The metadata clearly states the study that the data originates from with all relevant information about the study present as well. The metadata also meets the standards of health research, complying with CONSORT guidelines for information presentation and standardised measurements, while the repository page includes guidance on reproducing the research.
+The data set is findable: with a unique and persistent DOI. There is metadata providing a description of the dataset along with a title, authors, date of publication, and the identifier of the dataset, on the dataset's page where it is indexed in the Mendeley Data repository. The data also does well in accessibility, as the DOI allows for direct access to the dataset using standard web protocol, there are no barriers to access and no closed system involved. The metadata would stay accessible if the data became no longer available because it is stored in a persistent page independent of the files. On interoperability, the dataset uses standardised international psychological and physical activity measurement tools like the Beck depression inventory II and Edinburgh postnatal depression scale, meaning the information can be understood well by health researchers. However, there is no reported use of ontological vocabularies with identifiers, so this is a point for possible improvement. The metadata does include explicit qualified references to other sources of information, clearly stating the relationship between the two data, such as the study the data comes from, the measurement tools used, and the trial registration ID. Lastly, to address reusability, the data and metadata are described thoroughly with reference made to study design, population, interventions and outcome measures. There is a visible creative commons data usage license on the repository page with explicit permissions for reuse of the data. The metadata clearly states the study that the data originates from with all relevant information about the study present as well. The metadata also meets the standards of health research, complying with CONSORT guidelines for information presentation and standardised measurements, while the repository page includes guidance on reproducing the research.(286 words)
 
 
 ## Task 3: Reproducibility brief
