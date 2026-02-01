@@ -104,7 +104,7 @@ ggplot(figure3_data, aes(x = percent, y = group, fill = category)) +
     legend.direction = "vertical",
     axis.ticks.y = element_blank(),
     axis.ticks.x = element_blank(),
-    axis.text.y = element_text(size = 12, color = "black", hjust = 1, margin = margin(r = -25)),
+    axis.text.y = element_text(size = 9.5, color = "black", hjust = 1, margin = margin(r = 1)),
     axis.text.x = element_text(size = 12, color = "black")
   )
 ```
@@ -121,9 +121,9 @@ ggplot(figure3_data, aes(x = percent,
     labels = scales::label_percent(scale = 1)) +
   scale_fill_manual(
     values = c(
-      "range indicating the norm (below 10 points)" = "#C9C9C9",
-      "slightly increased severity of PPD symptoms (10-11 points)" = "#9ECBED",
-      "increased severity of PPD symptoms (12 or more points)" = "#3C97DA"
+      "range indicating the norm (below 10 points)" = "grey",
+      "slightly increased severity of PPD symptoms (10-11 points)" = "skyblue",
+      "increased severity of PPD symptoms (12 or more points)" = "dodgerblue"
     ),
     labels = c(
       "increased severity (>12 points)",
@@ -141,8 +141,9 @@ ggplot(figure3_data, aes(x = percent,
     title = "Distribution of Edinburgh Postnatal Depression Score (EDPS) by postpartum intervention",
     subtitle = "EDU = Educational Intervention, HIIT = High Intensity Interval Training"
   ) +
-  theme_minimal(base_size = 12) +
+  theme_minimal() +
   theme(
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
     panel.grid.minor.y = element_blank(),
     panel.grid.minor.x = element_line(),
     legend.position = "bottom",
