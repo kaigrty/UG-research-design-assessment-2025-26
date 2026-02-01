@@ -1,8 +1,10 @@
 ---
 title: "Group project assessment [template]"
-author: 'B249199, B249281'
+author: "B249199, B249281"
 date: "`r Sys.Date()`"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -11,7 +13,12 @@ library(readr)
 library(here)
 library(janitor)
 library(magrittr)
+
+library(ggplot2)
+library(dplyr)
+library(tidyr)
 ```
+
 
 NOTE: Please don't edit this template directly. Use `File` > `Save as` to create a copy of this document, rename it (remove the word "template" from the file name) and use that new version to write your report. Make sure to also update the Title and Author fields in the YAML of your .Rmd file.
 
@@ -23,15 +30,131 @@ data <- read_csv(here("data/HIIT-postpartum-depression.csv")) %>%
   clean_names()
   
 data[data == "#NULL!"] <- NA # standardising missing values to NA's instead of "#NULL!"
+
+# figure 3 data
+figure3_data <- data %>%
+  # assign readable interventions to groups
+  mutate(
+    group = case_when(
+      `intervention_group` == 1 ~ "HIIT – High Intensity Interval Training Group",
+      `intervention_group` == 2 ~ "EDU – Educational Intervention Group"
+    ),
+    # create column for depression score cutoffs
+    EPDS = as.numeric(`edinburg_postnatal_depression_scale_score`),
+    category = case_when(
+      EPDS < 10 ~ "range indicating the norm (below 10 points)",
+      EPDS >= 10 & EPDS < 12 ~ "slightly increased severity of PPD symptoms (10-11 points)",
+      EPDS >= 12 ~ "increased severity of PPD symptoms (12 or more points)"
+    )
+  ) %>% 
+  filter(!is.na(number_of_hiit_sessions_own_activity)) %>% 
+  # calculate percentages
+  drop_na(category) %>%
+  count(group, category) %>%
+  group_by(group) %>%
+  mutate(percent = n / sum(n) * 100) %>% 
+  ungroup() %>% 
+  mutate(group = factor(group, levels = c(
+      "HIIT – High Intensity Interval Training Group",
+      "EDU – Educational Intervention Group"
+    )),
+    category = factor(category, levels = c(
+      "increased severity of PPD symptoms (12 or more points)",
+      "slightly increased severity of PPD symptoms (10-11 points)",
+      "range indicating the norm (below 10 points)"))
+  )
+
 ```
 
 
-### Figure 3 - Kai (shaper)
+### Figure 3 - Kai
 ```{r figure-3}
 # Write your code for reproducing, and then improving Figure 3. Present both figures together. Under the figures, explain how you've improved Figure 3 and why you consider this an improvement.
 
+# replicated figure 3
+ggplot(figure3_data, aes(x = percent, y = group, fill = category)) +
+  geom_col(width = 0.4) +
+  scale_x_continuous(
+    breaks = seq(0, 100, by = 10),
+    labels = scales::label_percent(scale = 1, accuracy = 0.01)
+  ) +
+  scale_fill_manual(
+    values = c(
+      "range indicating the norm (below 10 points)" = "#9EC1FF",
+      "slightly increased severity of PPD symptoms (10-11 points)" = "#0B3C8A",
+      "increased severity of PPD symptoms (12 or more points)" = "#C21F17"
+    ),
+    name = NULL
+  ) +
+  labs(
+    x = NULL,
+    y = NULL
+  ) +
+  theme_bw() +
+  guides(fill = guide_legend(reverse = TRUE)) +
+  theme(
+    plot.margin = margin(t = 20, r = 5, b = 90, l = 30),
+    panel.border = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_line(colour = "grey85", linewidth = 0.8),
+    legend.position = "bottom",
+    legend.key.size = unit(0.4, "cm"),
+    legend.key.spacing.y = unit(0.4, "cm"),
+    legend.key.width  = unit(0.4, "cm"),
+    legend.key.height = unit(0.05, "cm"),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 13),
+    legend.direction = "vertical",
+    axis.ticks.y = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.text.y = element_text(size = 12, color = "black", hjust = 1, margin = margin(r = -25)),
+    axis.text.x = element_text(size = 12, color = "black")
+  )
+
+# improved figure 3
+ggplot(figure3_data, aes(x = percent, 
+                         y = recode(group,
+                                    "HIIT – High Intensity Interval Training Group" = "HIIT",
+                                    "EDU – Educational Intervention Group" = "EDU",), fill = category)) +
+  geom_col(width = 0.25) +
+  scale_x_continuous(
+    breaks = seq(0, 100, 10),
+    labels = scales::label_percent(scale = 1)) +
+  scale_fill_manual(
+    values = c(
+      "range indicating the norm (below 10 points)" = "#C9C9C9",
+      "slightly increased severity of PPD symptoms (10-11 points)" = "#9ECBED",
+      "increased severity of PPD symptoms (12 or more points)" = "#3C97DA"
+    ),
+    labels = c(
+      "increased severity (>12 points)",
+      "slightly increased severity (10-11 points)",
+      "healthy (<10 points)"
+    ),
+    name = "Postpartum depression severity levels"
+  ) +
+  geom_text(aes(label = paste0(sprintf("%.2f", percent), "%")), 
+            position = position_stack(vjust = 0.5), 
+            color = "black") +
+  labs(
+    x = NULL,
+    y = NULL,
+    title = "Distribution of Edinburgh Postnatal Depression Score (EDPS) by postpartum intervention",
+    subtitle = "EDU = Educational Intervention, HIIT = High Intensity Interval Training"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.minor.y = element_blank(),
+    panel.grid.minor.x = element_line(),
+    legend.position = "bottom",
+    legend.direction = "vertical",
+    axis.text.y = element_text(size = 11),
+    axis.text.x = element_text(size = 10)
+  )
 ```
 
+More progressive colours are used, with the distinct grey to communicate the healthy state as different from the two pathological. Added a title so the graph is self sufficient, and a subheading for acronyms so that they can be used on the y axis to give more space to the plot. Added percentage labels to the bars so the information being communicated is clearer, and minor breaks at each 5% interval for easier intuitive interpretation. Changed the label for severity under 10 points to a more accurate description.
 
 ### Figure 4 - James
 ```{r figure-4}
@@ -46,5 +169,8 @@ data[data == "#NULL!"] <- NA # standardising missing values to NA's instead of "
 
 
 ## Task 2: FAIR data principles
+The data set is findable: with a unique and persistent DOI. There is metadata providing a description of the dataset along with a title, authors, date of publication, and the identifier of the dataset, on the dataset's page where it is indexed in the Mendeley Data repository. The data also does well in accessibility, as the DOI allows for direct access to the dataset using standard web protocol, there are no barriers to access and no closed system involved. The metadata would stay accessible if the data became no longer available because it is stored in a persistent page independent of the files. On interoperability, the dataset uses standardised international psychological and physical activity measurement tools like the Beck depression inventory II and Edinburgh postnatal depression scale, meaning the information can be understood well by health researchers. However, there is no reported use of ontological vocabularies with identifiers, so this is a point for possible improvement. The metadata does include explicit qualified references to other sources of information, clearly stating the relationship between the two data, such as the study the data comes from, the measurement tools used, and the trial registration ID. Lastly, to address reusability, the data and metadata are described thoroughly with reference made to study design, population, interventions and outcome measures. There is a visible creative commons data usage license on the repository page with explicit permissions for reuse of the data. The metadata clearly states the study that the data originates from with all relevant information about the study present as well. The metadata also meets the standards of health research, complying with CONSORT guidelines for information presentation and standardised measurements, while the repository page includes guidance on reproducing the research.
+
 
 ## Task 3: Reproducibility brief
+
