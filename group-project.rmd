@@ -317,8 +317,95 @@ Contrasting colours are used which makes the trend clear when one line overtakes
 ### Figure 5 - Fimi
 ```{r figure-5}
 # Write your code for reproducing, and then improving Figure 5. Present both figures together. Under the figures, explain how you've improved Figure 5 and why you consider this an improvement.
+
+# original reproduction of figure 5
+fig5 <- data %>% 
+  select(participant_code,intervention_group,pre_sf_12_pcs_physicalhealthscale,post_sf12_pcs,postnatal_sf_12_pcs) %>%
+  # select the groups physical health before, after and follow up from intervention
+  mutate(pre_sf_12_pcs_physicalhealthscale = as.numeric(pre_sf_12_pcs_physicalhealthscale),post_sf12_pcs = as.numeric(post_sf12_pcs),postnatal_sf_12_pcs = as.numeric(postnatal_sf_12_pcs)) %>% 
+# make a new column and make all the columns same value 
+
+  pivot_longer(
+    cols = c(pre_sf_12_pcs_physicalhealthscale,
+      post_sf12_pcs,
+      postnatal_sf_12_pcs ), 
+    names_to = "time",
+    values_to = "physical_health") %>% 
+  # lengthens data and increase number of rows and decreases columns 
+    
+   mutate(time = factor( time,levels = c(
+        "pre_sf_12_pcs_physicalhealthscale",
+        "post_sf12_pcs",
+        "postnatal_sf_12_pcs"),
+      labels = c(
+        "Before intervention 
+        (II trimester of pregnancy)",
+        "After intervention
+        (III trimester of pregnancy)",
+        "Follow-up
+        (± 5 months postpartum" ))) %>% 
+# changes the name of the time columns to match intervetion timing
+
+    filter(!is.na(physical_health)) %>% 
+    mutate(intervention_group = factor(intervention_group))
+  
 ```
 
+```{r figure-5}
+# CALCULATE MEAN AND STANDARD DEVIATION
+
+fig5_summary <- fig5 %>% 
+  group_by(intervention_group,time)%>% 
+  summarise(mean_physical = mean(physical_health),sd_physical = sd(physical_health)) %>% 
+ mutate(mean_round = round(mean_physical,2)) 
+```
+
+
+```{r}
+ggplot(fig5_summary, aes(x=time,y=mean_physical,
+                         group=intervention_group,
+                         linetype = intervention_group)) +
+  geom_line(size=0.5) +
+  geom_errorbar(aes(
+    ymin = mean_physical-sd_physical,
+    ymax = mean_physical+sd_physical
+  ),
+  width = 0.05) +
+  geom_text(aes(label = paste0("M =", mean_round)), 
+            position = position_dodge(width = 0.2),
+            vjust = -1,
+            size = 3)+
+  scale_linetype_manual(values=c("solid","dotted")) +
+  labs(title = bquote(bold("Physical health")~"(measured with the Short Form Health Survey-physical subscale)"),
+    x="Time",
+    y= "Physical health (SF-12 physical subscale)"
+  )+
+  theme_minimal()
+```
+
+```{r}
+#new
+ggplot(fig5_summary, aes(x=time,y=mean_physical,
+colour = intervention_group,
+group = intervention_group)) +
+  geom_line(size=0.5) +
+  geom_errorbar(aes(
+    ymin = mean_physical-sd_physical,
+    ymax = mean_physical+sd_physical
+  ),
+  width = 0.05) +
+  geom_text(aes(label = paste0("M =", mean_round)), 
+            position = position_dodge(width = 0.2),
+            vjust = -1,
+            size = 3)+
+  scale_linetype_manual(values=c("solid","dotted")) +
+  labs(title = "Physical health scores across pregnancy and postpartum",
+    x="Assessment time point",
+    y= "SF-12 physical health score"
+  )+
+  theme_classic()
+```
+```
 
 ## Task 2: FAIR data principles
 The data set is findable: with a unique and persistent DOI. There is metadata providing a description of the dataset along with a title, authors, date of publication, and the identifier of the dataset, on the dataset's page where it is indexed in the Mendeley Data repository. The data also does well in accessibility, as the DOI allows for direct access to the dataset using standard web protocol, there are no barriers to access and no closed system involved. The metadata would stay accessible if the data became no longer available because it is stored in a persistent page independent of the files. On interoperability, the dataset uses standardised international psychological and physical activity measurement tools like the Beck depression inventory II and Edinburgh postnatal depression scale, meaning the information can be understood well by health researchers. However, there is no reported use of ontological vocabularies with identifiers, so this is a point for possible improvement. The metadata does include explicit qualified references to other sources of information, clearly stating the relationship between the two data, such as the study the data comes from, the measurement tools used, and the trial registration ID. Lastly, to address reusability, the data and metadata are described thoroughly with reference made to study design, population, interventions and outcome measures. There is a visible creative commons data usage license on the repository page with explicit permissions for reuse of the data. The metadata clearly states the study that the data originates from with all relevant information about the study present as well. The metadata also meets the standards of health research, complying with CONSORT guidelines for information presentation and standardised measurements, while the repository page includes guidance on reproducing the research.
