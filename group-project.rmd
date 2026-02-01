@@ -192,6 +192,8 @@ ggplot(data_4_long, aes(x = timepoint, y = mean, group = intervention_group, col
     )
 ```
 
+Contrasting colours are used which makes the trend clear when one line overtakes the other, where before it was difficult to tell. Dotted line is now unnecessary and removed. Error bars shifted horizontally so no longer overlap. Decimals on y-axis removed, it’s just extra cluster. Moving y-axis label to y-axis for less cluster on bottom. Label for the legend with explanation for what M = means added. Added grid minor y so that error bars can be more accurately estimated. Made ‘M =’ bold so easily readable. Y-axis set to 56 to 40 so lines less compressed. Points are added for better visibility.
+
 ### Figure 5 - Fimi
 ```{r figure-5}
 # Write your code for reproducing, and then improving Figure 5. Present both figures together. Under the figures, explain how you've improved Figure 5 and why you consider this an improvement.
