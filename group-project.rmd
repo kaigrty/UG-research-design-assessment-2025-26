@@ -34,8 +34,6 @@ data[data == "#NULL!"] <- NA # standardising missing values to NA's instead of "
 
 ### Figure 3 - Kai
 ```{r figure-3}
-# Write your code for reproducing, and then improving Figure 3. Present both figures together. Under the figures, explain how you've improved Figure 3 and why you consider this an improvement.
-
 # figure 3 data
 figure3_data <- data %>%
   # assign readable interventions to groups
@@ -109,7 +107,9 @@ ggplot(figure3_data, aes(x = percent, y = group, fill = category)) +
     axis.text.y = element_text(size = 12, color = "black", hjust = 1, margin = margin(r = -25)),
     axis.text.x = element_text(size = 12, color = "black")
   )
+```
 
+```{r figure-3 improved}
 # improved figure 3
 ggplot(figure3_data, aes(x = percent, 
                          y = recode(group,
@@ -344,7 +344,7 @@ fig5 <- data %>%
         (III trimester of pregnancy)",
         "Follow-up
         (± 5 months postpartum" ))) %>% 
-# changes the name of the time columns to match intervetion timing
+# changes the name of the time columns to match intervention timing
 
     filter(!is.na(physical_health)) %>% 
     mutate(intervention_group = factor(intervention_group))
@@ -404,7 +404,6 @@ group = intervention_group)) +
     y= "SF-12 physical health score"
   )+
   theme_classic()
-```
 ```
 
 ## Task 2: FAIR data principles
