@@ -1,8 +1,10 @@
 ---
 title: "Group project assessment [template]"
-author: 'B249199, B249281'
+author: "B249199, B249281"
 date: "`r Sys.Date()`"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -12,7 +14,9 @@ library(here)
 library(janitor)
 library(magrittr)
 library(tidyverse)
+library(ggtext)
 ```
+
 
 NOTE: Please don't edit this template directly. Use `File` > `Save as` to create a copy of this document, rename it (remove the word "template" from the file name) and use that new version to write your report. Make sure to also update the Title and Author fields in the YAML of your .Rmd file.
 
@@ -24,21 +28,291 @@ data <- read_csv(here("data/HIIT-postpartum-depression.csv")) %>%
   clean_names()
   
 data[data == "#NULL!"] <- NA # standardising missing values to NA's instead of "#NULL!"
+
+# figure 3 data
+figure3_data <- data %>%
+  # assign readable interventions to groups
+  mutate(
+    group = case_when(
+      `intervention_group` == 1 ~ "HIIT – High Intensity Interval Training Group",
+      `intervention_group` == 2 ~ "EDU – Educational Intervention Group"
+    ),
+    # create column for depression score cutoffs
+    EPDS = as.numeric(`edinburg_postnatal_depression_scale_score`),
+    category = case_when(
+      EPDS < 10 ~ "range indicating the norm (below 10 points)",
+      EPDS >= 10 & EPDS < 12 ~ "slightly increased severity of PPD symptoms (10-11 points)",
+      EPDS >= 12 ~ "increased severity of PPD symptoms (12 or more points)"
+    )
+  ) %>% 
+  filter(!is.na(number_of_hiit_sessions_own_activity)) %>% 
+  # calculate percentages
+  drop_na(category) %>%
+  count(group, category) %>%
+  group_by(group) %>%
+  mutate(percent = n / sum(n) * 100) %>% 
+  ungroup() %>% 
+  mutate(group = factor(group, levels = c(
+      "HIIT – High Intensity Interval Training Group",
+      "EDU – Educational Intervention Group"
+    )),
+    category = factor(category, levels = c(
+      "increased severity of PPD symptoms (12 or more points)",
+      "slightly increased severity of PPD symptoms (10-11 points)",
+      "range indicating the norm (below 10 points)"))
+  )
+
 ```
 
 
-### Figure 3 - Kai (shaper)
+### Figure 3 - Kai
 ```{r figure-3}
 # Write your code for reproducing, and then improving Figure 3. Present both figures together. Under the figures, explain how you've improved Figure 3 and why you consider this an improvement.
 
+# replicated figure 3
+ggplot(figure3_data, aes(x = percent, y = group, fill = category)) +
+  geom_col(width = 0.4) +
+  scale_x_continuous(
+    breaks = seq(0, 100, by = 10),
+    labels = scales::label_percent(scale = 1, accuracy = 0.01)
+  ) +
+  scale_fill_manual(
+    values = c(
+      "range indicating the norm (below 10 points)" = "#9EC1FF",
+      "slightly increased severity of PPD symptoms (10-11 points)" = "#0B3C8A",
+      "increased severity of PPD symptoms (12 or more points)" = "#C21F17"
+    ),
+    name = NULL
+  ) +
+  labs(
+    x = NULL,
+    y = NULL
+  ) +
+  theme_bw() +
+  guides(fill = guide_legend(reverse = TRUE)) +
+  theme(
+    plot.margin = margin(t = 20, r = 5, b = 90, l = 30),
+    panel.border = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_line(colour = "grey85", linewidth = 0.8),
+    legend.position = "bottom",
+    legend.key.size = unit(0.4, "cm"),
+    legend.key.spacing.y = unit(0.4, "cm"),
+    legend.key.width  = unit(0.4, "cm"),
+    legend.key.height = unit(0.05, "cm"),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 13),
+    legend.direction = "vertical",
+    axis.ticks.y = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.text.y = element_text(size = 12, color = "black", hjust = 1, margin = margin(r = -25)),
+    axis.text.x = element_text(size = 12, color = "black")
+  )
+
+# improved figure 3
+ggplot(figure3_data, aes(x = percent, 
+                         y = recode(group,
+                                    "HIIT – High Intensity Interval Training Group" = "HIIT",
+                                    "EDU – Educational Intervention Group" = "EDU",), fill = category)) +
+  geom_col(width = 0.25) +
+  scale_x_continuous(
+    breaks = seq(0, 100, 10),
+    labels = scales::label_percent(scale = 1)) +
+  scale_fill_manual(
+    values = c(
+      "range indicating the norm (below 10 points)" = "#C9C9C9",
+      "slightly increased severity of PPD symptoms (10-11 points)" = "#9ECBED",
+      "increased severity of PPD symptoms (12 or more points)" = "#3C97DA"
+    ),
+    labels = c(
+      "increased severity (>12 points)",
+      "slightly increased severity (10-11 points)",
+      "healthy (<10 points)"
+    ),
+    name = "Postpartum depression severity levels"
+  ) +
+  geom_text(aes(label = paste0(sprintf("%.2f", percent), "%")), 
+            position = position_stack(vjust = 0.5), 
+            color = "black") +
+  labs(
+    x = NULL,
+    y = NULL,
+    title = "Distribution of Edinburgh Postnatal Depression Score (EDPS) by postpartum intervention",
+    subtitle = "EDU = Educational Intervention, HIIT = High Intensity Interval Training"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.minor.y = element_blank(),
+    panel.grid.minor.x = element_line(),
+    legend.position = "bottom",
+    legend.direction = "vertical",
+    axis.text.y = element_text(size = 11),
+    axis.text.x = element_text(size = 10)
+  )
 ```
 
+More progressive colours are used, with the distinct grey to communicate the healthy state as different from the two pathological. Added a title so the graph is self sufficient, and a subheading for acronyms so that they can be used on the y axis to give more space to the plot. Added percentage labels to the bars so the information being communicated is clearer, and minor breaks at each 5% interval for easier intuitive interpretation. Changed the label for severity under 10 points to a more accurate description.
 
 ### Figure 4 - James
 ```{r figure-4}
-# Write your code for reproducing, and then improving Figure 4. Present both figures together. Under the figures, explain how you've improved Figure 4 and why you consider this an improvement.
+data_4 <- data %>%
+  ## Convert Flourishing Scale scores from string into numeric values ##
+  mutate(
+    pre_fs_scale = as.numeric(pre_fs_scale),
+    post_fs_score = as.numeric(post_fs_score),
+    postnatal_florishing_scale_score = as.numeric(postnatal_florishing_scale_score)
+    ) %>%
+  ## Remove missing values, if not done, the calculated means will be wrong ##
+  filter(
+    !is.na(pre_fs_scale),
+    !is.na(post_fs_score),
+    !is.na(postnatal_florishing_scale_score)
+    ) %>%
+  ## Calculate means and standard deviations for each of the 3 time points ##
+  group_by(intervention_group) %>%
+  summarise(
+    pre_mean = mean(pre_fs_scale),
+    pre_sd = sd(pre_fs_scale),
+    post_mean = mean(post_fs_score),
+    post_sd = sd(post_fs_score),
+    postnatal_mean = mean(postnatal_florishing_scale_score),
+    postnatal_sd = sd(postnatal_florishing_scale_score)
+    )
+
+## Pivot the data so that the 3 time points can be plotted and labelled on the x-axis with standard deviations and means
+data_4_long <- data_4 %>%
+  pivot_longer(
+    cols = c(pre_mean, post_mean, postnatal_mean),
+    names_to = "timepoint",
+    values_to = "mean" # The pivot is only done to the means, the standard deviation can later be added manually.
+    ) %>%
+  mutate(
+    sd = case_when(
+      timepoint == "pre_mean" ~ pre_sd,
+      timepoint == "post_mean" ~ post_sd,
+      timepoint == "postnatal_mean" ~ postnatal_sd # Adds in the standard deviation for each time point manually
+      ),
+    timepoint = factor( 
+      timepoint, 
+      levels = c("pre_mean", "post_mean", "postnatal_mean"),
+      labels = c("Before the intervention\n(II trimester of pregnancy)",
+                 "After the intervention\n(III trimester of pregnancy)",
+                 "Follow-up\n(± 5 months postpartum)" # Adds labels for each time point
+                 )
+      ),
+    intervention_group = factor(intervention_group) # Makes intervention_group be treated as categorical
+    )
+
+## Plot the graph
+ggplot(data_4_long, aes(x = timepoint, y = mean, group = intervention_group, linetype = factor(intervention_group))) +
+  geom_line() +
+  geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = 0.03, linetype = "solid") + # Creates error bars of the standard deviations
+  ## 'M =' text on the graph is added ## 
+  geom_text(aes(
+    label = sprintf("M = %.2f", mean), # Adds 2 decimal points
+    hjust = case_when(
+    ## Shifts the first 2 'M = ' text labels to the left of the error bars, and the final one to the right
+    grepl("Before|After", timepoint) ~ 1.2,
+    grepl("Follow", timepoint) ~ -0.2
+    ),
+    ## Shifts the 'M = ' up and down as not to overlap with the line.
+    vjust = case_when(
+      grepl("Before", timepoint) ~ ifelse(intervention_group == 1, 1.3, 0.1), 
+      grepl("After", timepoint) ~ ifelse(intervention_group == 1, -1.2, 1.8),
+      grepl("Follow", timepoint) ~ ifelse(intervention_group == 1, 0.6, 0.6),
+      )
+    ),
+    size = 3 # Set size of font
+    ) +
+  ## Legend configuration ##
+  theme(legend.position = "bottom") + # Moves legend to the bottom
+  guides(linetype = guide_legend(nrow = 2, byrow = TRUE)) + # Stacks the legend guide for the lines
+  scale_y_continuous(
+    ## Y-axis configuration ##
+    limits = c(40, 60), # Sets y-axis from 40 to 60 
+    breaks = seq(40, 60, by = 2), # Adds ticks every 2 units
+    labels = function(x) sprintf("%.2f", x) # Adds .00 to the y-axis
+    ) +
+  ## Line labelling ##
+  scale_linetype_manual(
+    values = c("1" = "solid", "2" = "dotted"),
+    labels = c("HIIT - High Intensity Interval Training Group", "EDU - Educational Intervention Group")
+    ) + 
+  ## Y-axis is labelled, however I have used the x label in order for it to be at the bottom. ##
+  labs(
+    x = "**Psychological well-being** (*measured with the Flourishing Scale*)",
+    y = NULL,
+    linetype = NULL
+    ) +
+  theme(
+    axis.title.x = element_markdown(margin = margin(t = 15)), # Spaces the y-axis label to be more central
+    legend.key = element_rect(fill = "transparent", color = NA), # Makes the legend icon for the lines' background transparent
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 1), # Adds the black border around teh graph
+    panel.background = element_rect(fill = "white", color = NA), # Makes background white
+    panel.grid.major.y = element_line(color = "grey80", linetype), # Adds the major y-axis grid lines
+    panel.grid.major.x = element_blank() # Shouldn't be necessary, but I notice that there is a small vertical white line which interrupts the major y-axis grid lines without this.
+    )
 ```
 
+```{r figure-4 improved}
+## Plot the graph
+ggplot(data_4_long, aes(x = timepoint, y = mean, group = intervention_group, color = factor(intervention_group))) +
+  geom_line() +
+  geom_point() +
+  # Creates error bars of the standard deviations
+  ## 'M =' text on the graph is added ## 
+  geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = 0.06, linetype = "solid", position = position_dodge(width = 0.03)) + # Error bars are shifted horizontally so no longer overlap
+  geom_text(aes(
+    label = sprintf("M = %.2f", mean), # Adds 2 decimal points to the 'M = '
+    hjust = case_when(
+    ## Shifts the first 2 'M = ' text labels to the left of the error bars, and the final one to the right
+      grepl("Before|After", timepoint) ~ 1.2,
+      grepl("Follow", timepoint) ~ -0.2
+      ),
+  vjust = case_when(
+    ## Shifts the 'M = ' up and down as not to overlap with the line.
+    grepl("Before", timepoint) ~ ifelse(intervention_group == 1, 1.3, 0.1),
+    grepl("After", timepoint) ~ ifelse(intervention_group == 1, -1.2, 1.8),
+    grepl("Follow", timepoint) ~ ifelse(intervention_group == 1, 0.6, 0.6)
+    )
+  ),
+  size = 3.2, # Change size of 'M = ' text
+  fontface = "bold", # Makes it bold
+  show.legend = FALSE # Otherwise there will be an 'a' in the legend key overlapping with the line
+  ) +
+  ## Legend configuration ##
+  theme(legend.position = "bottom") + # Moves legend to the bottom
+  guides(color = guide_legend(nrow = 2, byrow = TRUE)) + # Stacks the legend guide for the lines
+  scale_y_continuous(
+    limits = c(40, 56), # Sets y-axis from 40 to 60
+    breaks = seq(40, 60, by = 2) # Sets ticks every 2 units
+    ) +
+  scale_color_manual(
+    values = c("1" = "dodgerblue", "2" = "brown1"), # Sets contrasting colours for the lines
+    labels = c("**HIIT** - High Intensity Interval Training Group", "**EDU** - Educational Intervention Group")
+    ) + 
+  ## Y-axis is labelled on y-axis, and legend is labelled.
+  labs(
+    x = NULL,
+    y = "**Psychological well-being** (*measured with the Flourishing Scale*)",
+    color = "**Intervention Group** (*M = Mean*)"
+    ) +
+  theme(
+    ## element_markdown() is used on several areas of the graph in order to make text bold using the ggtext package.
+    axis.title.y = element_markdown(size = 10, margin = margin(t = 15, l = 10, r = 10)), # Y-axis is given margins to better fit onto graph.
+    legend.title = element_markdown(),
+    legend.text = element_markdown(),
+    legend.key = element_rect(fill = "transparent", color = NA), # Makes lines' key background transparent
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 1), # Adds border around the graph
+    panel.background = element_rect(fill = "white", color = NA), # Makes graph background white
+    panel.grid.major.y = element_line(color = "grey80"), # Adds major y-axis grid
+    panel.grid.minor.y = element_line(color = "grey80"), # Adds minor y-axis grid
+    panel.grid.major.x = element_blank() # There is a small vertical white line which interrupts the major y-axis grid lines without this.
+    )
+```
+
+Contrasting colours are used which makes the trend clear when one line overtakes the other, where before it was difficult to tell. Dotted line is now unnecessary and removed. Error bars shifted horizontally so no longer overlap. Decimals on y-axis removed, it’s just extra cluster. Moving y-axis label to y-axis for less cluster on bottom. Label for the legend with explanation for what M = means added. Added grid minor y so that error bars can be more accurately estimated. Made ‘M =’ bold so easily readable. Y-axis set to 56 to 40 so lines less compressed. Points are added for better visibility.
 
 ### Figure 5 - Fimi
 ```{r figure-5}
@@ -134,5 +408,8 @@ group = intervention_group)) +
 ```
 
 ## Task 2: FAIR data principles
+The data set is findable: with a unique and persistent DOI. There is metadata providing a description of the dataset along with a title, authors, date of publication, and the identifier of the dataset, on the dataset's page where it is indexed in the Mendeley Data repository. The data also does well in accessibility, as the DOI allows for direct access to the dataset using standard web protocol, there are no barriers to access and no closed system involved. The metadata would stay accessible if the data became no longer available because it is stored in a persistent page independent of the files. On interoperability, the dataset uses standardised international psychological and physical activity measurement tools like the Beck depression inventory II and Edinburgh postnatal depression scale, meaning the information can be understood well by health researchers. However, there is no reported use of ontological vocabularies with identifiers, so this is a point for possible improvement. The metadata does include explicit qualified references to other sources of information, clearly stating the relationship between the two data, such as the study the data comes from, the measurement tools used, and the trial registration ID. Lastly, to address reusability, the data and metadata are described thoroughly with reference made to study design, population, interventions and outcome measures. There is a visible creative commons data usage license on the repository page with explicit permissions for reuse of the data. The metadata clearly states the study that the data originates from with all relevant information about the study present as well. The metadata also meets the standards of health research, complying with CONSORT guidelines for information presentation and standardised measurements, while the repository page includes guidance on reproducing the research.
+
 
 ## Task 3: Reproducibility brief
+
