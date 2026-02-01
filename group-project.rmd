@@ -257,7 +257,7 @@ ggplot(data_4_long, aes(x = timepoint, y = mean, group = intervention_group, lin
   theme(
     axis.title.x = element_markdown(margin = margin(t = 15)), # Spaces the y-axis label to be more central
     legend.key = element_rect(fill = "transparent", color = NA), # Makes the legend icon for the lines' background transparent
-    panel.border = element_rect(color = "black", fill = NA, linewidth = 1), # Adds the black border around teh graph
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 1), # Adds the black border around the graph
     panel.background = element_rect(fill = "white", color = NA), # Makes background white
     panel.grid.major.y = element_line(color = "grey80", linetype), # Adds the major y-axis grid lines
     panel.grid.major.x = element_blank() # Shouldn't be necessary, but I notice that there is a small vertical white line which interrupts the major y-axis grid lines without this.
@@ -325,24 +325,34 @@ Contrasting colours are used which makes the trend clear when one line overtakes
 
 ### Figure 5 - Fimi
 ```{r figure-5}
-# Write your code for reproducing, and then improving Figure 5. Present both figures together. Under the figures, explain how you've improved Figure 5 and why you consider this an improvement.
-
 # original reproduction of figure 5
 fig5 <- data %>% 
-  select(participant_code,intervention_group,pre_sf_12_pcs_physicalhealthscale,post_sf12_pcs,postnatal_sf_12_pcs) %>%
+  # make a new column and make all the columns same value
+  mutate(pre_sf_12_pcs_physicalhealthscale = as.numeric(pre_sf_12_pcs_physicalhealthscale),
+         post_sf12_pcs = as.numeric(post_sf12_pcs),
+         postnatal_sf_12_pcs = as.numeric(postnatal_sf_12_pcs),
+         group = case_when(
+           `intervention_group` == 1 ~ "HIIT – High Intensity Interval Training Group",
+           `intervention_group` == 2 ~ "EDU – Educational Intervention Group")) %>%
+  # filter out excluded participants
+    filter(
+    !is.na(pre_sf_12_pcs_physicalhealthscale),
+    !is.na(post_sf12_pcs),
+    !is.na(postnatal_sf_12_pcs)
+    ) %>%
   # select the groups physical health before, after and follow up from intervention
-  mutate(pre_sf_12_pcs_physicalhealthscale = as.numeric(pre_sf_12_pcs_physicalhealthscale),post_sf12_pcs = as.numeric(post_sf12_pcs),postnatal_sf_12_pcs = as.numeric(postnatal_sf_12_pcs)) %>% 
-# make a new column and make all the columns same value 
-
-  pivot_longer(
-    cols = c(pre_sf_12_pcs_physicalhealthscale,
-      post_sf12_pcs,
-      postnatal_sf_12_pcs ), 
+  select(participant_code, group, pre_sf_12_pcs_physicalhealthscale, post_sf12_pcs,postnatal_sf_12_pcs) %>%
+  
+  # lengthens data and increase number of rows and decreases columns 
+  pivot_longer(cols = c(
+    pre_sf_12_pcs_physicalhealthscale,
+    post_sf12_pcs,
+    postnatal_sf_12_pcs), 
     names_to = "time",
     values_to = "physical_health") %>% 
-  # lengthens data and increase number of rows and decreases columns 
-    
-   mutate(time = factor( time,levels = c(
+  
+  # changes the name of the time columns to match intervention timing 
+   mutate(time = factor(time, levels = c(
         "pre_sf_12_pcs_physicalhealthscale",
         "post_sf12_pcs",
         "postnatal_sf_12_pcs"),
@@ -352,27 +362,22 @@ fig5 <- data %>%
         "After intervention
         (III trimester of pregnancy)",
         "Follow-up
-        (± 5 months postpartum" ))) %>% 
-# changes the name of the time columns to match intervention timing
-
+        (± 5 months postpartum"))) %>% 
     filter(!is.na(physical_health)) %>% 
-    mutate(intervention_group = factor(intervention_group))
+    mutate(group = factor(group))
   
-```
-
-```{r figure-5}
-# CALCULATE MEAN AND STANDARD DEVIATION
-
+# Calculate mean and standard deviation
 fig5_summary <- fig5 %>% 
-  group_by(intervention_group,time)%>% 
-  summarise(mean_physical = mean(physical_health),sd_physical = sd(physical_health)) %>% 
+  group_by(group, time) %>% 
+  summarise(mean_physical = mean(physical_health, na.rm = TRUE), 
+            sd_physical = sd(physical_health, na.rm = TRUE)) %>% 
  mutate(mean_round = round(mean_physical,2)) 
-```
 
-```{r}
+
+# plot replicated graph
 ggplot(fig5_summary, aes(x=time,y=mean_physical,
-                         group=intervention_group,
-                         linetype = intervention_group)) +
+                         group=group,
+                         linetype = group)) +
   geom_line(size=0.5) +
   geom_errorbar(aes(
     ymin = mean_physical-sd_physical,
@@ -382,17 +387,19 @@ ggplot(fig5_summary, aes(x=time,y=mean_physical,
   geom_text(aes(label = paste0("M =", mean_round)), 
             position = position_dodge(width = 0.2),
             vjust = -1,
-            size = 3)+
-  scale_linetype_manual(values=c("solid","dotted")) +
-  labs(title = bquote(bold("Physical health")~"(measured with the Short Form Health Survey-physical subscale)"),
-    x="Time",
-    y= "Physical health (SF-12 physical subscale)"
-  )+
-  theme_minimal()
+            size = 3) +
+  scale_linetype_manual(values=c("solid","dotted"), name = NULL) +
+  labs(
+    x = bquote(bold("Physical health")~"(measured with the Short Form Health Survey-physical subscale)"),
+    y = NULL
+  ) +
+  theme(
+    legend.position = "bottom"
+  ) 
 ```
 
 ```{r}
-#new
+# improved figure 5
 ggplot(fig5_summary, aes(x=time,y=mean_physical,
 colour = intervention_group,
 group = intervention_group)) +
@@ -402,7 +409,7 @@ group = intervention_group)) +
     ymax = mean_physical+sd_physical
   ),
   width = 0.05) +
-  geom_text(aes(label = paste0("M =", mean_round)), 
+  geom_text(aes(label = paste0("M = ", mean_round)), 
             position = position_dodge(width = 0.2),
             vjust = -1,
             size = 3)+
@@ -419,4 +426,4 @@ The data set is findable: with a unique and persistent DOI. There is metadata pr
 
 
 ## Task 3: Reproducibility brief
-
+The strongest point for the study's reproducibility was its following of CONSORT reporting guidelines, ensuring transparency in relaying the results of the trial. It was also good practice to register a protocol for maintenance of the integrity of the study, which would inevitably have a positive impact on any repeat iteration of the methodology. The outcome measures used standardised and validated measurement tools like EPDS, BDI-II, Flourishing Scale, providing a well-reported method for determining outcomes, with clear cut offs and scoring. The statistical tests used were also well reported, with the software specified as SPSS v27, and a list of the exact tests used on display. The dataset for the results is also publicly available with a dedicated DOI and landing page in the Mendeley data repository, meaning anyone can carry out the analysis on the raw results. For points of improvement: there were no exact details about the HIIT group intervention, where there should have been information on interval structure, progression rules, exercise selection, decision rules for tailoring workouts etc. The results section of the study was also rather terse in relaying exact numbers, meaning this information has to be partially gleaned from just the visualisations. Some of the graphs are quite difficult to read, with compressed or overlapping parts in the figure, making interpretation of the results uncertain. When appraising the quality of a reproduced study, the matching of the new results to the original is paramount so this is a sizeable obstacle in that regard. The study design itself makes external reproducibility rather difficult as the sample population is exclusively Caucasian Polish, and engages with only one healthcare system, thus the results will likely be different in a sample without this narrow demographic profile. (287 words)
