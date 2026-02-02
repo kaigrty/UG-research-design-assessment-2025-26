@@ -445,7 +445,6 @@ ggplot(figure5_data_long, aes(x=time,y=mean_physical,
 group = group,
 colour = group )) +
   geom_line(size=0.5) +
-  geom_point() +
   geom_errorbar(aes(
     ymin = mean_physical-sd_physical,
     ymax = mean_physical+sd_physical
