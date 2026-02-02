@@ -3,8 +3,8 @@ title: "Group project assessment [template]"
 author: "B249199, B249281"
 date: "`r Sys.Date()`"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -148,16 +148,17 @@ ggplot(figure3_data, aes(x = percent,
     title = "Distribution of Edinburgh Postnatal Depression Score (EDPS) by postpartum intervention",
     subtitle = "EDU = Educational Intervention, HIIT = High Intensity Interval Training"
   ) +
-  # minimal theme to increase focus on the data
-  theme_minimal() +
+  # theme designed to increase focus on the data
   theme(
+    panel.background = element_rect(fill = "white", color = NA),
     panel.border = element_rect(color = "black", fill = NA, linewidth = 1), # border to distinguish data from other info
     panel.grid.minor.y = element_blank(),
-    panel.grid.minor.x = element_line(),
     legend.position = "bottom",
     legend.direction = "vertical",
     axis.text.y = element_text(size = 11),
-    axis.text.x = element_text(size = 10)
+    axis.text.x = element_text(size = 10),
+    panel.grid.major.x = element_line(color = "grey80"),
+    panel.grid.minor.x = element_line(color = "grey80")
   )
 ```
 
@@ -165,7 +166,7 @@ More progressive colours are used, with the distinct grey to communicate the hea
 
 ### Figure 4 - James
 ```{r figure-4}
-data_4 <- data %>%
+figure4_data <- data %>%
   ## Convert Flourishing Scale scores from string into numeric values ##
   mutate(
     pre_fs_scale = as.numeric(pre_fs_scale),
@@ -190,7 +191,7 @@ data_4 <- data %>%
     )
 
 ## Pivot the data so that the 3 time points can be plotted and labelled on the x-axis with standard deviations and means
-data_4_long <- data_4 %>%
+figure4_data_long <- figure4_data %>% # Creating a new variable to more clearly lay out when the data is turned long.
   pivot_longer(
     cols = c(pre_mean, post_mean, postnatal_mean),
     names_to = "timepoint",
@@ -214,7 +215,7 @@ data_4_long <- data_4 %>%
     )
 
 ## Plot the graph
-ggplot(data_4_long, aes(x = timepoint, y = mean, group = intervention_group, linetype = factor(intervention_group))) +
+ggplot(figure4_data_long, aes(x = timepoint, y = mean, group = intervention_group, linetype = factor(intervention_group))) +
   geom_line() +
   geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = 0.03, linetype = "solid") + # Creates error bars of the standard deviations
   ## 'M =' text on the graph is added ## 
@@ -260,13 +261,15 @@ ggplot(data_4_long, aes(x = timepoint, y = mean, group = intervention_group, lin
     panel.border = element_rect(color = "black", fill = NA, linewidth = 1), # Adds the black border around the graph
     panel.background = element_rect(fill = "white", color = NA), # Makes background white
     panel.grid.major.y = element_line(color = "grey80", linetype), # Adds the major y-axis grid lines
-    panel.grid.major.x = element_blank() # Shouldn't be necessary, but I notice that there is a small vertical white line which interrupts the major y-axis grid lines without this.
+    panel.grid.major.x = element_blank(), # Shouldn't be necessary, but I notice that there is a small vertical white line which interrupts the major y-axis grid lines without this.
+    axis.ticks.y = element_blank(),
+    axis.ticks.x = element_blank() # Makes axis ticks dissapear
     )
 ```
 
 ```{r figure-4 improved}
 ## Plot the graph
-ggplot(data_4_long, aes(x = timepoint, y = mean, group = intervention_group, color = factor(intervention_group))) +
+ggplot(figure4_data_long, aes(x = timepoint, y = mean, group = intervention_group, color = factor(intervention_group))) +
   geom_line() +
   geom_point() +
   # Creates error bars of the standard deviations
@@ -287,11 +290,10 @@ ggplot(data_4_long, aes(x = timepoint, y = mean, group = intervention_group, col
     )
   ),
   size = 3.2, # Change size of 'M = ' text
-  fontface = "bold", # Makes it bold
+  fontface = "bold", # Makes "M = " bold
   show.legend = FALSE # Otherwise there will be an 'a' in the legend key overlapping with the line
   ) +
   ## Legend configuration ##
-  theme(legend.position = "bottom") + # Moves legend to the bottom
   guides(color = guide_legend(nrow = 2, byrow = TRUE)) + # Stacks the legend guide for the lines
   scale_y_continuous(
     limits = c(40, 56), # Sets y-axis from 40 to 60
@@ -303,9 +305,11 @@ ggplot(data_4_long, aes(x = timepoint, y = mean, group = intervention_group, col
     ) + 
   ## Y-axis is labelled on y-axis, and legend is labelled.
   labs(
+    title = "Between-group differences in psychological well-being across pregnancy/postpartum timepoints",
     x = NULL,
     y = "**Psychological well-being** (*measured with the Flourishing Scale*)",
-    color = "**Intervention Group** (*M = Mean*)"
+    subtitle = "M = Mean",
+    color = "**Intervention Group**"
     ) +
   theme(
     ## element_markdown() is used on several areas of the graph in order to make text bold using the ggtext package.
@@ -317,16 +321,17 @@ ggplot(data_4_long, aes(x = timepoint, y = mean, group = intervention_group, col
     panel.background = element_rect(fill = "white", color = NA), # Makes graph background white
     panel.grid.major.y = element_line(color = "grey80"), # Adds major y-axis grid
     panel.grid.minor.y = element_line(color = "grey80"), # Adds minor y-axis grid
-    panel.grid.major.x = element_blank() # There is a small vertical white line which interrupts the major y-axis grid lines without this.
+    panel.grid.major.x = element_blank(), # There is a small vertical white line which interrupts the major y-axis grid lines without this.
+    legend.position = "bottom" # Moves legend to the bottom
     )
 ```
 
-Contrasting colours are used which makes the trend clear when one line overtakes the other, where before it was difficult to tell. Dotted line is now unnecessary and removed. Error bars shifted horizontally so no longer overlap. Decimals on y-axis removed, it’s just extra cluster. Moving y-axis label to y-axis for less cluster on bottom. Label for the legend with explanation for what M = means added. Added grid minor y so that error bars can be more accurately estimated. Made ‘M =’ bold so easily readable. Y-axis set to 56 to 40 so lines less compressed. Points are added for better visibility.
+Contrasting colours are used which makes the trend clear when one line overtakes the other, where before it was difficult to tell. Dotted line is now unnecessary and removed. Error bars shifted horizontally so no longer overlap. Decimals on y-axis removed, it’s just extra cluster. Moving y-axis label to y-axis for less cluster on bottom. Label for the legend with explanation for what M = means added. Added grid minor y so that error bars can be more accurately estimated. Made ‘M =’ bold so easily readable. Y-axis set to 56 to 40 so lines less compressed. Points are added for better visibility. Title added to reflect figure description from study.
 
 ### Figure 5 - Fimi
 ```{r figure-5}
 # original reproduction of figure 5
-fig5 <- data %>% 
+figure5_data <- data %>% 
   # make a new column and make all the columns same value
   mutate(pre_sf_12_pcs_physicalhealthscale = as.numeric(pre_sf_12_pcs_physicalhealthscale),
          post_sf12_pcs = as.numeric(post_sf12_pcs),
@@ -356,18 +361,18 @@ fig5 <- data %>%
         "pre_sf_12_pcs_physicalhealthscale",
         "post_sf12_pcs",
         "postnatal_sf_12_pcs"),
-      labels = c(
-        "Before intervention 
-        (II trimester of pregnancy)",
-        "After intervention
-        (III trimester of pregnancy)",
-        "Follow-up
-        (± 5 months postpartum"))) %>% 
+      labels = c("Before the intervention\n(II trimester of pregnancy)",
+                 "After the intervention\n(III trimester of pregnancy)",
+                 "Follow-up\n(± 5 months postpartum)" # Adds labels for each time point
+                 ))) %>% 
     filter(!is.na(physical_health)) %>% 
-    mutate(group = factor(group))
+    mutate(group = factor(group, levels = c(
+    "HIIT – High Intensity Interval Training Group",
+    "EDU – Educational Intervention Group"
+  )))
   
 # Calculate mean and standard deviation
-fig5_summary <- fig5 %>% 
+figure5_data_long <- figure5_data %>% 
   group_by(group, time) %>% 
   summarise(mean_physical = mean(physical_health, na.rm = TRUE), 
             sd_physical = sd(physical_health, na.rm = TRUE)) %>% 
@@ -375,7 +380,7 @@ fig5_summary <- fig5 %>%
 
 
 # plot replicated graph
-ggplot(fig5_summary, aes(x=time,y=mean_physical,
+ggplot(figure5_data_long, aes(x=time,y=mean_physical,
                          group=group,
                          linetype = group)) +
   geom_line(size=0.5) +
@@ -383,43 +388,117 @@ ggplot(fig5_summary, aes(x=time,y=mean_physical,
     ymin = mean_physical-sd_physical,
     ymax = mean_physical+sd_physical
   ),
-  width = 0.05) +
-  geom_text(aes(label = paste0("M =", mean_round)), 
-            position = position_dodge(width = 0.2),
-            vjust = -1,
-            size = 3) +
-  scale_linetype_manual(values=c("solid","dotted"), name = NULL) +
+  width = 0.05,
+  linetype = "solid") +
+  geom_text(aes(
+    label = paste0("M = ", mean_round),
+    hjust = case_when(
+    ## Shifts the first 2 'M = ' text labels to the left of the error bars, and the final one to the right
+      grepl("Before", time) ~ 1.2,
+      grepl("After", time) ~ 1.2,
+      grepl("Follow", time) ~ -0.2
+      ),
+  vjust = case_when(
+    ## Shifts the 'M = ' up and down as not to overlap with the line.
+    grepl("Before", time) ~ ifelse(group == "HIIT – High Intensity Interval Training Group", 4.7, -3.8),
+    grepl("After", time) ~ ifelse(group == "HIIT – High Intensity Interval Training Group", -1, 1.7),
+    grepl("Follow", time) ~ ifelse(group == "HIIT – High Intensity Interval Training Group", -1, 1)
+    )
+  ),
+            size = 3.5,
+            fontface = "bold", # Makes "M = " bold
+            show.legend = FALSE)+ # Otherwise there will be an 'a' in the legend key overlapping with the line
   labs(
-    x = bquote(bold("Physical health")~"(measured with the Short Form Health Survey-physical subscale)"),
-    y = NULL
+    x = "**Physical health** *(measured with the Short Form Health Survey - physical subscale)*",
+    y = NULL,
+    linetype = NULL
   ) +
+  scale_y_continuous(
+    ## Y-axis configuration ##
+    limits = c(35, 60), # Sets y-axis from 40 to 60 
+    breaks = seq(35, 60, by = 5), # Adds ticks every 2 units
+    labels = function(x) sprintf("%.2f", x) # Adds .00 to the y-axis
+    ) +
+  scale_linetype_manual(values = c(
+    "HIIT – High Intensity Interval Training Group" = "solid",
+    "EDU – Educational Intervention Group" = "dotted"
+  )) +
+  guides(linetype = guide_legend(nrow = 2, byrow = TRUE)) + # Stacks the legend guide for the lines
   theme(
-    legend.position = "bottom"
+    axis.title.x = element_markdown(margin = margin(t = 15)), # Spaces the x-axis label to be more central
+    legend.title = element_markdown(),
+    legend.key = element_rect(fill = "transparent", color = NA), # Makes the legend icon for the lines' background transparent
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 1), # Adds the black border around the graph
+    panel.background = element_rect(fill = "white", color = NA), # Makes background white
+    panel.grid.major.y = element_line(color = "grey80", linetype), # Adds the major y-axis grid lines
+    panel.grid.major.x = element_blank(), # Shouldn't be necessary, but I notice that there is a small vertical white line which interrupts the major y-axis grid lines without this.
+    legend.position = "bottom",
+    axis.ticks.y = element_blank(),
+    axis.ticks.x = element_blank() # Makes axis ticks dissapear
   ) 
 ```
 
 ```{r}
 # improved figure 5
-ggplot(fig5_summary, aes(x=time,y=mean_physical,
-colour = intervention_group,
-group = intervention_group)) +
+ggplot(figure5_data_long, aes(x=time,y=mean_physical,
+colour = group,
+group = group)) +
   geom_line(size=0.5) +
+  geom_point() +
   geom_errorbar(aes(
     ymin = mean_physical-sd_physical,
     ymax = mean_physical+sd_physical
   ),
-  width = 0.05) +
-  geom_text(aes(label = paste0("M = ", mean_round)), 
-            position = position_dodge(width = 0.2),
-            vjust = -1,
-            size = 3)+
-  scale_linetype_manual(values=c("solid","dotted")) +
-  labs(title = "Physical health scores across pregnancy and postpartum",
-    x="Assessment time point",
-    y= "SF-12 physical health score"
-  )+
-  theme_classic()
+  width = 0.06,
+  position = position_dodge(width = 0.03)) +
+  geom_text(aes(
+    label = paste0("M = ", mean_round),
+    hjust = case_when(
+    ## Shifts the first 2 'M = ' text labels to the left of the error bars, and the final one to the right
+      grepl("Before", time) ~ 1.2,
+      grepl("After", time) ~ 1.2,
+      grepl("Follow", time) ~ -0.2
+      ),
+  vjust = case_when(
+    ## Shifts the 'M = ' up and down as not to overlap with the line.
+    grepl("Before", time) ~ ifelse(group == "HIIT – High Intensity Interval Training Group", 0.1, 0.3),
+    grepl("After", time) ~ ifelse(group == "HIIT – High Intensity Interval Training Group", -1, 1.7),
+    grepl("Follow", time) ~ ifelse(group == "HIIT – High Intensity Interval Training Group", -1, 1)
+    )
+  ),
+            size = 3.5,
+            fontface = "bold", # Makes "M = " bold
+            show.legend = FALSE)+ # Otherwise there will be an 'a' in the legend key overlapping with the line
+  scale_color_manual(
+    values = c("HIIT – High Intensity Interval Training Group" = "dodgerblue", "EDU – Educational Intervention Group" = "brown1")) + # Sets contrasting colours for the lines
+  labs(title = "Between-group differences in physical health across pregnancy/postpartum timepoints",
+    x = NULL,
+    subtitle = "M = Mean",
+    y= "**Physical health** *(measured with the Short Form Health Survey - physical subscale)*",
+    color = "Intervention Group"
+  ) +
+  scale_y_continuous(
+    ## Y-axis configuration ##
+    limits = c(35, 60), # Sets y-axis from 40 to 60 
+    breaks = seq(35, 60, by = 5) # Adds ticks every 2 units
+    ) +
+  guides(color = guide_legend(nrow = 2, byrow = TRUE)) + # Stacks the legend guide for the lines
+  theme(
+    axis.title.y = element_markdown(size = 11, margin = margin(t = 15, l = 10, r = 10)),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 1), # Adds border around the graph
+    panel.background = element_rect(fill = "white", color = NA), # Makes graph background white
+    panel.grid.major.y = element_line(color = "grey80"), # Adds major y-axis grid
+    panel.grid.minor.y = element_line(color = "grey80"), # Adds minor y-axis grid
+    panel.grid.major.x = element_blank(), # There is a small vertical white line which interrupts the major y-axis grid lines without this.
+    axis.title.x = element_markdown(margin = margin(t = 15)), # Spaces the y-axis label to be more central
+    legend.key = element_rect(fill = "transparent", color = NA), # Makes the legend icon for the lines' background transparent
+    legend.position = "bottom"
+  )
 ```
+
+The 'Before the intervention' timepoint means positions are fixed. Contrasting colours are used to more explicity show the trend lines and error bars. The error bars are shifted horizontally so they no longer overlap. The means are made bold to be more easily readable. Points are added for more clarity. Y-axis label is added for more context. Title added to reflect figure description from study. Decimal points removed for less clutter. Axis ticks added. Legend title added so figure is more self-explanatory.
+
+
 
 ## Task 2: FAIR data principles
 The data set is findable: with a unique and persistent DOI. There is metadata providing a description of the dataset along with a title, authors, date of publication, and the identifier of the dataset, on the dataset's page where it is indexed in the Mendeley Data repository. The data also does well in accessibility, as the DOI allows for direct access to the dataset using standard web protocol, there are no barriers to access and no closed system involved. The metadata would stay accessible if the data became no longer available because it is stored in a persistent page independent of the files. On interoperability, the dataset uses standardised international psychological and physical activity measurement tools like the Beck depression inventory II and Edinburgh postnatal depression scale, meaning the information can be understood well by health researchers. However, there is no reported use of ontological vocabularies with identifiers, so this is a point for possible improvement. The metadata does include explicit qualified references to other sources of information, clearly stating the relationship between the two data, such as the study the data comes from, the measurement tools used, and the trial registration ID. Lastly, to address reusability, the data and metadata are described thoroughly with reference made to study design, population, interventions and outcome measures. There is a visible creative commons data usage license on the repository page with explicit permissions for reuse of the data. The metadata clearly states the study that the data originates from with all relevant information about the study present as well. The metadata also meets the standards of health research, complying with CONSORT guidelines for information presentation and standardised measurements, while the repository page includes guidance on reproducing the research.(286 words)
