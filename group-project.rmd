@@ -1,6 +1,6 @@
 ---
 title: "Group project assessment [template]"
-author: "B249199, B249281"
+author: "B249199, B249281,B251495"
 date: "`r Sys.Date()`"
 output:
   html_document: default
@@ -431,7 +431,7 @@ ggplot(figure5_data_long, aes(x=time,y=mean_physical,
     legend.key = element_rect(fill = "transparent", color = NA), # Makes the legend icon for the lines' background transparent
     panel.border = element_rect(color = "black", fill = NA, linewidth = 1), # Adds the black border around the graph
     panel.background = element_rect(fill = "white", color = NA), # Makes background white
-    panel.grid.major.y = element_line(color = "grey80", linetype), # Adds the major y-axis grid lines
+    panel.grid.major.y = element_line(color = "grey80"), # Adds the major y-axis grid lines
     panel.grid.major.x = element_blank(), # Shouldn't be necessary, but I notice that there is a small vertical white line which interrupts the major y-axis grid lines without this.
     legend.position = "bottom",
     axis.ticks.y = element_blank(),
@@ -495,7 +495,7 @@ colour = group )) +
   )
 ```
 
-The 'Before the intervention' timepoint means positions are fixed. Contrasting colours are used to more explicity show the trend lines and error bars. The error bars are shifted horizontally so they no longer overlap. The means are made bold to be more easily readable. Points are added for more clarity. Y-axis label is added for more context. Title added to reflect figure description from study. Decimal points removed for less clutter. Axis ticks added. Legend title added so figure is more self-explanatory.(82 words)
+Figure 5 was first reproduced to closely match the original published figure. The improved version enhances clarity by using contrasting colours with line type to distinguish intervention groups. Error bars were horizontally offset and mean values bolded, improving visual readability. Clear axis labels and a descriptive title were added to provide contextual information about the outcome measure and study period. The y-axis scale was standardised to avoid exaggeration of group differences, and a caption was included to explicitly define the plotted statistics, making the figure more self-explanatory. (87 words)
 
 
 
