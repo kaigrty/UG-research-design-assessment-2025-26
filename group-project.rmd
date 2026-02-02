@@ -285,7 +285,6 @@ ggplot(figure4_data_long, aes(x = timepoint, y = mean, group = intervention_grou
 ## Plot the graph
 ggplot(figure4_data_long, aes(x = timepoint, y = mean, group = intervention_group, color = factor(intervention_group))) +
   geom_line() +
-  geom_point() +
   # Creates error bars of the standard deviations
   ## 'M =' text on the graph is added ## 
   geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = 0.06, linetype = "solid", position = position_dodge(width = 0.03)) + # Error bars are shifted horizontally so no longer overlap
@@ -320,15 +319,16 @@ ggplot(figure4_data_long, aes(x = timepoint, y = mean, group = intervention_grou
   ## Y-axis is labelled on y-axis, and legend is labelled.
   labs(
     title = "Between-group differences in psychological well-being across pregnancy/postpartum timepoints",
-    x = NULL,
+    x = "**Assessment time point**",
     y = "**Psychological well-being** (*measured with the Flourishing Scale*)",
     caption = "Values are means (M). Error bars represent standard deviation of the mean.",
     color = "**Intervention Group**"
     ) +
   theme(
     ## element_markdown() is used on several areas of the graph in order to make text bold using the ggtext package.
-    axis.title.y = element_markdown(size = 10, margin = margin(t = 15, l = 10, r = 10)), # Y-axis is given margins to better fit onto graph.
+    axis.title.y = element_markdown(size = 9, margin = margin(t = 15, l = 10, r = 10)), # Y-axis is given margins to better fit onto graph.
     plot.title = element_text(size = 10),
+    axis.title.x = element_markdown(margin = margin(t = 15)),
     legend.title = element_markdown(),
     legend.text = element_markdown(),
     legend.key = element_rect(fill = "transparent", color = NA), # Makes lines' key background transparent
@@ -341,7 +341,7 @@ ggplot(figure4_data_long, aes(x = timepoint, y = mean, group = intervention_grou
     )
 ```
 
-Contrasting colours are used which makes the trend clear when one line overtakes the other, where before it was difficult to tell. Dotted line is now unnecessary and removed. Error bars shifted horizontally so no longer overlap. Decimals on y-axis removed, it’s just extra cluster. Moving y-axis label to y-axis for less cluster on bottom. Label for the legend with explanation for what M = means added. Added grid minor y so that error bars can be more accurately estimated. Made ‘M =’ bold so easily readable. Y-axis set to 56 to 40 so lines less compressed. Points are added for better visibility. Title added to reflect figure description from study.(111 words)
+Contrasting colours are used which makes the trend clear when one line overtakes the other, where before it was difficult to tell. Dotted line is now unnecessary and removed. Error bars shifted horizontally so no longer overlap. Decimals on y-axis removed, it’s just extra cluster. Moving y-axis label to y-axis for less cluster on bottom. Label for the legend and x-axis added. Caption with explanation for what M = means and what error bars are added. Added grid minor y so that error bars can be more accurately estimated. Made ‘M =’ bold so easily readable. Y-axis set to 56 to 40 so lines less compressed. Title added to reflect figure description from study.(114 words)
 
 ### Figure 5 - Fimi
 ```{r figure-5}
@@ -459,8 +459,8 @@ ggplot(figure5_data_long, aes(x=time,y=mean_physical,
 # improved figure 5
 ggplot(figure5_data_long, aes(x=time,y=mean_physical,
 group = group,
-colour = group )) +
-  geom_line(size=0.5) +
+color = group )) +
+  geom_line(linewidth=0.5) +
   geom_errorbar(aes(
     ymin = mean_physical-sd_physical,
     ymax = mean_physical+sd_physical
@@ -486,11 +486,14 @@ colour = group )) +
             fontface = "bold", # Makes "M = " bold
             show.legend = FALSE)+ # Otherwise there will be an 'a' in the legend key overlapping with the line
   scale_color_manual(
-    values = c("HIIT – High Intensity Interval Training Group" = "dodgerblue", "EDU – Educational Intervention Group" = "brown1")) + # Sets contrasting colours for the lines
-  labs(title = bquote(bold("Physical health scores across pregnancy and postpartum")),
-    x = "Assessment time point",
-    y= "SF-12 physical health",
-    caption = "Values are means (M). Error bars represent standard deviation of the mean."
+    values = c("HIIT – High Intensity Interval Training Group" = "dodgerblue", "EDU – Educational Intervention Group" = "brown1"),
+    labels = c("**HIIT** - High Intensity Interval Training Group", "**EDU** - Educational Intervention Group")
+    ) + # Sets contrasting colours for the lines
+  labs(title = "Between-group differences in physical health across pregnancy/postpartum timepoints",
+    x = "**Assessment time point**",
+    y= "**Physical health** *(measured with the 12-item Short Form Health Survey)*",
+    caption = "Values are means (M). Error bars represent standard deviation of the mean.",
+    color = "**Intervention Group**"
   ) +
   scale_y_continuous(
     ## Y-axis configuration ##
@@ -499,7 +502,10 @@ colour = group )) +
     ) +
   guides(color = guide_legend(nrow = 2, byrow = TRUE)) + # Stacks the legend guide for the lines
   theme(
-    axis.title.y = element_markdown(size = 8, margin = margin(t = 15, l = 10, r = 10)),
+    axis.title.y = element_markdown(size = 8, margin = margin(t = 20, l = 10, r = 10)),
+    legend.title = element_markdown(),
+    plot.title = element_text(size = 10),
+    legend.text = element_markdown(),
     panel.border = element_rect(color = "black", fill = NA, linewidth = 1), # Adds border around the graph
     panel.background = element_rect(fill = "white", color = NA), # Makes graph background white
     panel.grid.major.y = element_line(color = "grey80"), # Adds major y-axis grid
@@ -511,7 +517,7 @@ colour = group )) +
   )
 ```
 
-Figure 5 was first reproduced to closely match the original published figure. The improved version enhances clarity by using contrasting colours with line type to distinguish intervention groups. Error bars were horizontally offset and mean values bolded, improving visual readability. Clear axis labels and a descriptive title were added to provide contextual information about the outcome measure and study period. The y-axis scale was standardised to avoid exaggeration of group differences, and a caption was included to explicitly define the plotted statistics, making the figure more self-explanatory. (87 words)
+The original means position on "before the intervention" timepoint are swapped and corrected. Clarity is enhanced by using contrasting colours to better distinguish intervention groups. Error bars were horizontally offset and mean values bolded, improving visual readability. Clear axis labels and a descriptive title were added to provide contextual information about the outcome measure and study period. The y-axis scale was standardised to avoid exaggeration of group differences, and a caption was included to explicitly define the plotted statistics, making the figure more self-explanatory. (84 words)
 
 
 
