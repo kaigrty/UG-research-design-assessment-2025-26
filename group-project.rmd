@@ -322,7 +322,7 @@ ggplot(figure4_data_long, aes(x = timepoint, y = mean, group = intervention_grou
     title = "Between-group differences in psychological well-being across pregnancy/postpartum timepoints",
     x = NULL,
     y = "**Psychological well-being** (*measured with the Flourishing Scale*)",
-    subtitle = "M = Mean",
+    caption = "Values are means (M). Error bars represent standard deviation of the mean.",
     color = "**Intervention Group**"
     ) +
   theme(
