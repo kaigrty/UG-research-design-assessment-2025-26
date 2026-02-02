@@ -159,7 +159,7 @@ ggplot(figure3_data, aes(x = percent, y = group_short, fill = category)) +
     x = NULL,
     y = NULL,
     title = "Distribution of Edinburgh Postnatal Depression Score (EDPS) by postpartum intervention",
-    subtitle = "EDU = Educational Intervention, HIIT = High Intensity Interval Training"
+    caption = "EDU = Educational Intervention, HIIT = High Intensity Interval Training"
   ) +
   # theme designed to increase focus on the data
   theme(
