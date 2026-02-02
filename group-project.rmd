@@ -5,6 +5,10 @@ date: "`r Sys.Date()`"
 output:
   html_document: default
   pdf_document: default
+format:
+    html:
+      fig-width: 12
+      out-width: "100%"
 ---
 
 ```{r setup, include=FALSE}
@@ -32,15 +36,15 @@ data[data == "#NULL!"] <- NA # standardising missing values to NA's instead of "
 
 
 ### Figure 3 - Kai
-```{r figure-3, fig.width = 12, out.width = "100%"}
+```{r figure-3}
 # figure 3 data
 figure3_data <- data %>%
   # assign readable interventions to groups
   mutate(
     group = case_when(
       `intervention_group` == 1 ~ "HIIT – High Intensity Interval Training Group",
-      `intervention_group` == 2 ~ "EDU – Educational Intervention Group"
-    ),
+      `intervention_group` == 2 ~ "EDU – Educational Intervention Group",
+      ),
     # create column for depression score cutoffs
     EPDS = as.numeric(`edinburg_postnatal_depression_scale_score`),
     category = case_when(
@@ -115,11 +119,20 @@ ggplot(figure3_data, aes(x = percent, y = group, fill = category)) +
 ```
 
 ```{r figure-3 improved}
+figure3_data <- figure3_data %>% 
+  mutate(
+    group_short = factor(
+      recode(
+        as.character(group),
+        "HIIT – High Intensity Interval Training Group" = "HIIT",
+        "EDU – Educational Intervention Group" = "EDU"
+        ),
+        levels = c("HIIT", "EDU")
+      )
+    )
+
 # improved figure 3
-ggplot(figure3_data, aes(x = percent, 
-                         y = recode(group, # remove full name of interventions
-                                    "HIIT - High Intensity Interval Training Group" = "HIIT",
-                                    "EDU - Educational Intervention Group" = "EDU"), fill = category)) +
+ggplot(figure3_data, aes(x = percent, y = group_short, fill = category)) +
   geom_col(width = 0.25) +
   scale_x_continuous(
     breaks = seq(0, 100, 10),
@@ -139,7 +152,8 @@ ggplot(figure3_data, aes(x = percent,
   ) +
   geom_text(aes(label = paste0(sprintf("%.2f", percent), "%")), # labels for bar proportions 
             position = position_stack(vjust = 0.5), 
-            color = "black") +
+            color = "black",
+            size = 3) +
   # add title and subtitle
   labs(
     x = NULL,
@@ -152,12 +166,13 @@ ggplot(figure3_data, aes(x = percent,
     panel.background = element_rect(fill = "white", color = NA),
     panel.border = element_rect(color = "black", fill = NA, linewidth = 1), # border to distinguish data from other info
     panel.grid.minor.y = element_blank(),
+    plot.title = element_text(size = 12),
     legend.position = "bottom",
     legend.direction = "vertical",
-    axis.text.y = element_text(size = 11),
+    axis.text.y = element_text(size = 8),
     axis.text.x = element_text(size = 10),
-    panel.grid.major.x = element_line(color = "grey80"),
-    panel.grid.minor.x = element_line(color = "grey80")
+    panel.grid.major.x = element_line(color = "grey80", linewidth = 0.5),
+    panel.grid.minor.x = element_line(color = "grey80", linewidth = 0.2)
   )
 ```
 
@@ -313,6 +328,7 @@ ggplot(figure4_data_long, aes(x = timepoint, y = mean, group = intervention_grou
   theme(
     ## element_markdown() is used on several areas of the graph in order to make text bold using the ggtext package.
     axis.title.y = element_markdown(size = 10, margin = margin(t = 15, l = 10, r = 10)), # Y-axis is given margins to better fit onto graph.
+    plot.title = element_text(size = 10),
     legend.title = element_markdown(),
     legend.text = element_markdown(),
     legend.key = element_rect(fill = "transparent", color = NA), # Makes lines' key background transparent
@@ -382,7 +398,7 @@ figure5_data_long <- figure5_data %>%
 ggplot(figure5_data_long, aes(x=time,y=mean_physical,
                          group=group,
                          linetype = group)) +
-  geom_line(size=0.5) +
+  geom_line(linewidth=0.5) +
   geom_errorbar(aes(
     ymin = mean_physical-sd_physical,
     ymax = mean_physical+sd_physical
@@ -483,7 +499,7 @@ group = group)) +
     ) +
   guides(color = guide_legend(nrow = 2, byrow = TRUE)) + # Stacks the legend guide for the lines
   theme(
-    axis.title.y = element_markdown(size = 11, margin = margin(t = 15, l = 10, r = 10)),
+    axis.title.y = element_markdown(size = 8, margin = margin(t = 15, l = 10, r = 10)),
     panel.border = element_rect(color = "black", fill = NA, linewidth = 1), # Adds border around the graph
     panel.background = element_rect(fill = "white", color = NA), # Makes graph background white
     panel.grid.major.y = element_line(color = "grey80"), # Adds major y-axis grid
