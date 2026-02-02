@@ -32,7 +32,7 @@ data[data == "#NULL!"] <- NA # standardising missing values to NA's instead of "
 
 
 ### Figure 3 - Kai
-```{r figure-3}
+```{r figure-3, fig.width = 12, out.width = "100%"}
 # figure 3 data
 figure3_data <- data %>%
   # assign readable interventions to groups
@@ -104,14 +104,13 @@ ggplot(figure3_data, aes(x = percent, y = group, fill = category)) +
     legend.key.spacing.y = unit(0.4, "cm"),
     legend.key.width  = unit(0.4, "cm"),
     legend.key.height = unit(0.05, "cm"),
-    legend.text = element_text(size = 12),
-    legend.title = element_text(size = 13),
+    legend.text = element_text(size = 7),
     legend.direction = "vertical",
     # axes configuration
     axis.ticks.y = element_blank(),
     axis.ticks.x = element_blank(),
-    axis.text.y = element_text(size = 9.5, color = "black", hjust = 1, margin = margin(r = 1)),
-    axis.text.x = element_text(size = 12, color = "black")
+    axis.text.y = element_text(size = 8, color = "black", hjust = 1, margin = margin(r = 1)),
+    axis.text.x = element_text(size = 8, color = "black")
   )
 ```
 
@@ -119,8 +118,8 @@ ggplot(figure3_data, aes(x = percent, y = group, fill = category)) +
 # improved figure 3
 ggplot(figure3_data, aes(x = percent, 
                          y = recode(group, # remove full name of interventions
-                                    "HIIT – High Intensity Interval Training Group" = "HIIT",
-                                    "EDU – Educational Intervention Group" = "EDU",), fill = category)) +
+                                    "HIIT - High Intensity Interval Training Group" = "HIIT",
+                                    "EDU - Educational Intervention Group" = "EDU"), fill = category)) +
   geom_col(width = 0.25) +
   scale_x_continuous(
     breaks = seq(0, 100, 10),
@@ -162,7 +161,7 @@ ggplot(figure3_data, aes(x = percent,
   )
 ```
 
-More progressive colours are used, with the distinct grey to communicate the healthy state as different from the two pathological ones. Added a title so the graph is self sufficient, and a subheading for acronyms so that they can be used on the y axis to give more space to the plot. Added percentage labels to the bars so the information being communicated is clearer, and minor breaks at each 5% interval for easier intuitive interpretation. Changed the label for severity under 10 points to a more accurate description.
+More progressive colours are used, with the distinct grey to communicate the healthy state as different from the two pathological ones. Added a title so the graph is self sufficient, and a subheading for acronyms so that they can be used on the y axis to give more space to the plot. Added percentage labels to the bars so the information being communicated is clearer, and minor breaks at each 5% interval for easier intuitive interpretation. Changed the label for severity under 10 points to a more accurate description.(89 words)
 
 ### Figure 4 - James
 ```{r figure-4}
@@ -326,7 +325,7 @@ ggplot(figure4_data_long, aes(x = timepoint, y = mean, group = intervention_grou
     )
 ```
 
-Contrasting colours are used which makes the trend clear when one line overtakes the other, where before it was difficult to tell. Dotted line is now unnecessary and removed. Error bars shifted horizontally so no longer overlap. Decimals on y-axis removed, it’s just extra cluster. Moving y-axis label to y-axis for less cluster on bottom. Label for the legend with explanation for what M = means added. Added grid minor y so that error bars can be more accurately estimated. Made ‘M =’ bold so easily readable. Y-axis set to 56 to 40 so lines less compressed. Points are added for better visibility. Title added to reflect figure description from study.
+Contrasting colours are used which makes the trend clear when one line overtakes the other, where before it was difficult to tell. Dotted line is now unnecessary and removed. Error bars shifted horizontally so no longer overlap. Decimals on y-axis removed, it’s just extra cluster. Moving y-axis label to y-axis for less cluster on bottom. Label for the legend with explanation for what M = means added. Added grid minor y so that error bars can be more accurately estimated. Made ‘M =’ bold so easily readable. Y-axis set to 56 to 40 so lines less compressed. Points are added for better visibility. Title added to reflect figure description from study.(111 words)
 
 ### Figure 5 - Fimi
 ```{r figure-5}
@@ -496,7 +495,7 @@ group = group)) +
   )
 ```
 
-The 'Before the intervention' timepoint means positions are fixed. Contrasting colours are used to more explicity show the trend lines and error bars. The error bars are shifted horizontally so they no longer overlap. The means are made bold to be more easily readable. Points are added for more clarity. Y-axis label is added for more context. Title added to reflect figure description from study. Decimal points removed for less clutter. Axis ticks added. Legend title added so figure is more self-explanatory.
+The 'Before the intervention' timepoint means positions are fixed. Contrasting colours are used to more explicity show the trend lines and error bars. The error bars are shifted horizontally so they no longer overlap. The means are made bold to be more easily readable. Points are added for more clarity. Y-axis label is added for more context. Title added to reflect figure description from study. Decimal points removed for less clutter. Axis ticks added. Legend title added so figure is more self-explanatory.(82 words)
 
 
 
