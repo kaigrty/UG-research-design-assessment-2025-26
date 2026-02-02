@@ -417,7 +417,7 @@ ggplot(figure5_data_long, aes(x=time,y=mean_physical,
       ),
   vjust = case_when(
     ## Shifts the 'M = ' up and down as not to overlap with the line.
-    grepl("Before", time) ~ ifelse(group == "HIIT – High Intensity Interval Training Group", 4.7, -3.8),
+    grepl("Before", time) ~ ifelse(group == "HIIT – High Intensity Interval Training Group", 2.7, -1.8),
     grepl("After", time) ~ ifelse(group == "HIIT – High Intensity Interval Training Group", -1, 1.7),
     grepl("Follow", time) ~ ifelse(group == "HIIT – High Intensity Interval Training Group", -1, 1)
     )
@@ -455,7 +455,7 @@ ggplot(figure5_data_long, aes(x=time,y=mean_physical,
   ) 
 ```
 
-```{r}
+```{r figure-5 improved}
 # improved figure 5
 ggplot(figure5_data_long, aes(x=time,y=mean_physical,
 group = group,
