@@ -1,6 +1,6 @@
 ---
 title: "Group project assessment [template]"
-author: "B249199, B249281"
+author: "B249199, B249281,B251495"
 date: "`r Sys.Date()`"
 output:
   html_document: default
@@ -348,7 +348,9 @@ Contrasting colours are used which makes the trend clear when one line overtakes
 # original reproduction of figure 5
 figure5_data <- data %>% 
   # make a new column and make all the columns same value
-  mutate(pre_sf_12_pcs_physicalhealthscale = as.numeric(pre_sf_12_pcs_physicalhealthscale),
+  mutate(
+    intervention_group = factor(intervention_group),
+    pre_sf_12_pcs_physicalhealthscale = as.numeric(pre_sf_12_pcs_physicalhealthscale),
          post_sf12_pcs = as.numeric(post_sf12_pcs),
          postnatal_sf_12_pcs = as.numeric(postnatal_sf_12_pcs),
          group = case_when(
@@ -445,7 +447,7 @@ ggplot(figure5_data_long, aes(x=time,y=mean_physical,
     legend.key = element_rect(fill = "transparent", color = NA), # Makes the legend icon for the lines' background transparent
     panel.border = element_rect(color = "black", fill = NA, linewidth = 1), # Adds the black border around the graph
     panel.background = element_rect(fill = "white", color = NA), # Makes background white
-    panel.grid.major.y = element_line(color = "grey80", linetype), # Adds the major y-axis grid lines
+    panel.grid.major.y = element_line(color = "grey80"), # Adds the major y-axis grid lines
     panel.grid.major.x = element_blank(), # Shouldn't be necessary, but I notice that there is a small vertical white line which interrupts the major y-axis grid lines without this.
     legend.position = "bottom",
     axis.ticks.y = element_blank(),
@@ -456,10 +458,9 @@ ggplot(figure5_data_long, aes(x=time,y=mean_physical,
 ```{r}
 # improved figure 5
 ggplot(figure5_data_long, aes(x=time,y=mean_physical,
-colour = group,
-group = group)) +
+group = group,
+colour = group )) +
   geom_line(size=0.5) +
-  geom_point() +
   geom_errorbar(aes(
     ymin = mean_physical-sd_physical,
     ymax = mean_physical+sd_physical
@@ -486,11 +487,10 @@ group = group)) +
             show.legend = FALSE)+ # Otherwise there will be an 'a' in the legend key overlapping with the line
   scale_color_manual(
     values = c("HIIT – High Intensity Interval Training Group" = "dodgerblue", "EDU – Educational Intervention Group" = "brown1")) + # Sets contrasting colours for the lines
-  labs(title = "Between-group differences in physical health across pregnancy/postpartum timepoints",
-    x = NULL,
-    subtitle = "M = Mean",
-    y= "**Physical health** *(measured with the Short Form Health Survey - physical subscale)*",
-    color = "Intervention Group"
+  labs(title = bquote(bold("Physical health scores across pregnancy and postpartum")),
+    x = "Assessment time point",
+    y= "SF-12 physical health",
+    caption = "Values are means (M). Error bars represent standard deviation of the mean."
   ) +
   scale_y_continuous(
     ## Y-axis configuration ##
@@ -511,7 +511,7 @@ group = group)) +
   )
 ```
 
-The 'Before the intervention' timepoint means positions are fixed. Contrasting colours are used to more explicity show the trend lines and error bars. The error bars are shifted horizontally so they no longer overlap. The means are made bold to be more easily readable. Points are added for more clarity. Y-axis label is added for more context. Title added to reflect figure description from study. Decimal points removed for less clutter. Axis ticks added. Legend title added so figure is more self-explanatory.(82 words)
+Figure 5 was first reproduced to closely match the original published figure. The improved version enhances clarity by using contrasting colours with line type to distinguish intervention groups. Error bars were horizontally offset and mean values bolded, improving visual readability. Clear axis labels and a descriptive title were added to provide contextual information about the outcome measure and study period. The y-axis scale was standardised to avoid exaggeration of group differences, and a caption was included to explicitly define the plotted statistics, making the figure more self-explanatory. (87 words)
 
 
 
